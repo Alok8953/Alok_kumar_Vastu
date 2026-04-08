@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="520" viewBox="0 0 720 520" fill="none">
+  <rect width="720" height="520" rx="20" fill="#F9F4E8"/>
+  <circle cx="360" cy="220" r="110" fill="#F2E4C6"/>
+  <rect x="190" y="360" width="340" height="24" rx="12" fill="#DECBA3"/>
+  <rect x="240" y="400" width="240" height="18" rx="9" fill="#E7D6B2"/>
+  <text x="360" y="230" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#7D6631">
+    Hero Placeholder
+  </text>
+</svg>

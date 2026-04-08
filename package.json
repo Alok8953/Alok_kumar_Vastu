@@ -1,0 +1,19 @@
+{
+  "name": "pankitgoyal-clone-fullstack",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace @app/backend\" \"npm run dev --workspace @app/frontend\"",
+    "dev:frontend": "npm run dev --workspace @app/frontend",
+    "dev:backend": "npm run dev --workspace @app/backend",
+    "build": "npm run build --workspace @app/frontend",
+    "start": "npm run start --workspace @app/backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
