@@ -1,5 +1,6 @@
 import { getHealthStatus } from "../services/healthService.js";
 
-export function healthController(req, res) {
-  res.json(getHealthStatus());
+export async function healthController(req, res) {
+  const status = await getHealthStatus();
+  res.json(status);
 }

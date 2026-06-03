@@ -1,10 +1,15 @@
-export function SiteHeader({ isMenuOpen, setIsMenuOpen, activeId, navItems }) {
+import { CTA_BUTTON_LABEL } from "../../constants/siteContent.js";
+
+export function SiteHeader({ isMenuOpen, setIsMenuOpen, activeId, navItems, onOpenModal }) {
   return (
-    <header className="site-header" id="home">
+    <header className="site-header">
       <div className="container nav-wrap">
         <a className="brand" href="#home" aria-label="Homepage">
-          <img src="/assets/logo-placeholder.svg" alt="Alok Kumar Mishra logo" />
-          <span>Alok Kumar Mishra - Vastu Consultant</span>
+          <img src="/assets/vastu-compass-logo.svg" alt="" width={44} height={44} />
+          <span className="brand-text">
+            <span className="brand-name">Alok Kumar Mishra</span>
+            <span className="brand-role">Vastu Consultant</span>
+          </span>
         </a>
 
         <button
@@ -34,9 +39,9 @@ export function SiteHeader({ isMenuOpen, setIsMenuOpen, activeId, navItems }) {
               {item.label}
             </a>
           ))}
-          <a className="btn btn-primary nav-cta" href="#book">
-            Book Consultation
-          </a>
+          <button className="btn btn-primary nav-cta" onClick={onOpenModal}>
+            {CTA_BUTTON_LABEL}
+          </button>
         </nav>
       </div>
     </header>

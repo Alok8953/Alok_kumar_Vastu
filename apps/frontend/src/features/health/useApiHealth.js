@@ -6,7 +6,10 @@ export function useApiHealth() {
 
   useEffect(() => {
     getHealth()
-      .then((data) => setApiStatus(data.message))
+      .then((data) => {
+        const dbLabel = data.database === "connected" ? "PostgreSQL connected" : "PostgreSQL offline";
+        setApiStatus(`${data.message} · ${dbLabel}`);
+      })
       .catch(() => setApiStatus("API offline"));
   }, []);
 
