@@ -181,6 +181,23 @@ function buildReviewMailOptions(data) {
   };
 }
 
+function createGmailTransporter() {
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    requireTLS: true,
+    family: 4,
+    connectionTimeout: 15_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 20_000,
+    auth: {
+      user: env.gmailUser,
+      pass: env.gmailAppPassword
+    }
+  });
+}
+
 export async function sendReviewEmail(data) {
   if (!isEmailConfigured()) {
     throw new Error(
@@ -188,13 +205,7 @@ export async function sendReviewEmail(data) {
     );
   }
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: env.gmailUser,
-      pass: env.gmailAppPassword
-    }
-  });
+  const transporter = createGmailTransporter();
 
   await transporter.sendMail(buildReviewMailOptions(data));
 }
@@ -206,13 +217,7 @@ export async function sendCallbackEmail(data) {
     );
   }
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: env.gmailUser,
-      pass: env.gmailAppPassword
-    }
-  });
+  const transporter = createGmailTransporter();
 
   await transporter.sendMail(buildMailOptions(data));
 }
