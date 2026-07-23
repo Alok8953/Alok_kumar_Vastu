@@ -12,7 +12,7 @@ async function startServer() {
   } catch (err) {
     console.error("Failed to connect to PostgreSQL:", err.message);
     console.error(
-      "Check DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME in apps/backend/.env"
+      "Check DATABASE_URL (or DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME) in apps/backend/.env"
     );
     process.exit(1);
   }

@@ -17,7 +17,8 @@ function parseDatabaseUrl(rawUrl) {
   }
 }
 
-const fromUrl = parseDatabaseUrl(process.env.DATABASE_URL);
+const databaseUrl = process.env.DATABASE_URL || "";
+const fromUrl = parseDatabaseUrl(databaseUrl);
 
 export const env = {
   nodeEnv: process.env.NODE_ENV || "development",
@@ -28,6 +29,7 @@ export const env = {
   gmailUser: process.env.GMAIL_USER || "alokkmishra06@gmail.com",
   gmailAppPassword: process.env.GMAIL_APP_PASSWORD || "",
   toEmail: process.env.TO_EMAIL || "alokkmishra06@gmail.com",
+  databaseUrl: databaseUrl || null,
   db: fromUrl || {
     host: process.env.DB_HOST || "localhost",
     port: Number(process.env.DB_PORT || 5432),
