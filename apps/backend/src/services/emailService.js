@@ -1,12 +1,25 @@
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { env } from "../config/env.js";
 
-function isEmailConfigured() {
+function isResendConfigured() {
+  return Boolean(env.resendApiKey);
+}
+
+function isGmailConfigured() {
   return (
     env.gmailUser &&
     env.gmailAppPassword &&
     env.gmailAppPassword !== "your-16-char-app-password-here"
   );
+}
+
+function isEmailConfigured() {
+  return isResendConfigured() || isGmailConfigured();
+}
+
+function apiPublicBaseUrl() {
+  return env.backendPublicUrl || env.frontendOrigin;
 }
 
 function escapeHtml(value) {
@@ -68,7 +81,7 @@ function emailSection(title) {
   `;
 }
 
-function buildMailOptions(data) {
+function buildCallbackMailContent(data) {
   const concerns = data.primaryConcerns.map((c) => escapeHtml(c)).join(", ");
   const propertyTypes = (data.propertyTypes || []).map((t) => escapeHtml(t)).join(", ");
   const contactLabel =
@@ -133,12 +146,10 @@ function buildMailOptions(data) {
   ];
 
   return {
-    from: `"Vastu Website" <${env.gmailUser}>`,
-    to: env.toEmail,
-    replyTo: data.email ? data.email : env.gmailUser,
     subject: `New Vastu Callback — ${data.fullName} (${data.consultationMethod})`,
     html,
-    text: textLines.join("\n")
+    text: textLines.join("\n"),
+    replyTo: data.email ? data.email : env.gmailUser
   };
 }
 
@@ -146,13 +157,12 @@ function starsLabel(rating) {
   return "★".repeat(rating) + "☆".repeat(5 - rating);
 }
 
-function buildReviewMailOptions(data) {
-  const approveUrl = `${env.frontendOrigin}/api/reviews/approve-email?token=${encodeURIComponent(data.approveToken)}`;
-  const rejectUrl = `${env.frontendOrigin}/api/reviews/reject-email?token=${encodeURIComponent(data.approveToken)}`;
+function buildReviewMailContent(data) {
+  const apiBase = apiPublicBaseUrl();
+  const approveUrl = `${apiBase}/api/reviews/approve-email?token=${encodeURIComponent(data.approveToken)}`;
+  const rejectUrl = `${apiBase}/api/reviews/reject-email?token=${encodeURIComponent(data.approveToken)}`;
 
   return {
-    from: `"Vastu Website" <${env.gmailUser}>`,
-    to: env.toEmail,
     subject: `New Client Review — ${data.fullName}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px; background: #f9f9f9; border-radius: 10px;">
@@ -198,28 +208,52 @@ function createGmailTransporter() {
   });
 }
 
-export async function sendReviewEmail(data) {
-  if (!isEmailConfigured()) {
-    throw new Error(
-      "Email is not configured on the server. Set GMAIL_APP_PASSWORD in apps/backend/.env"
-    );
+async function deliverEmail({ subject, html, text, replyTo }) {
+  if (isResendConfigured()) {
+    const resend = new Resend(env.resendApiKey);
+    const payload = {
+      from: env.resendFrom,
+      to: [env.toEmail],
+      subject,
+      html
+    };
+
+    if (text) payload.text = text;
+    if (replyTo) payload.replyTo = replyTo;
+
+    const { error } = await resend.emails.send(payload);
+    if (error) {
+      throw new Error(error.message || "Resend email failed.");
+    }
+    return;
   }
 
-  const transporter = createGmailTransporter();
+  if (isGmailConfigured()) {
+    const transporter = createGmailTransporter();
+    await transporter.sendMail({
+      from: `"Vastu Website" <${env.gmailUser}>`,
+      to: env.toEmail,
+      subject,
+      html,
+      text,
+      replyTo
+    });
+    return;
+  }
 
-  await transporter.sendMail(buildReviewMailOptions(data));
+  throw new Error(
+    "Email is not configured. Set RESEND_API_KEY (Render) or GMAIL_APP_PASSWORD (local)."
+  );
+}
+
+export async function sendReviewEmail(data) {
+  const mail = buildReviewMailContent(data);
+  await deliverEmail(mail);
 }
 
 export async function sendCallbackEmail(data) {
-  if (!isEmailConfigured()) {
-    throw new Error(
-      "Email is not configured on the server. Set GMAIL_APP_PASSWORD in apps/backend/.env"
-    );
-  }
-
-  const transporter = createGmailTransporter();
-
-  await transporter.sendMail(buildMailOptions(data));
+  const mail = buildCallbackMailContent(data);
+  await deliverEmail(mail);
 }
 
 export { isEmailConfigured };

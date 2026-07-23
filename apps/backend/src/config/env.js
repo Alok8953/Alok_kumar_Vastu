@@ -24,8 +24,12 @@ export const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   port: process.env.PORT || 5000,
   frontendOrigin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
+  backendPublicUrl: (process.env.BACKEND_PUBLIC_URL || "").replace(/\/$/, ""),
   serveFrontend: process.env.SERVE_FRONTEND === "true",
   adminApiKey: process.env.ADMIN_API_KEY || "",
+  resendApiKey: process.env.RESEND_API_KEY || "",
+  resendFrom:
+    process.env.RESEND_FROM || "Vastu Website <onboarding@resend.dev>",
   gmailUser: process.env.GMAIL_USER || "alokkmishra06@gmail.com",
   gmailAppPassword: process.env.GMAIL_APP_PASSWORD || "",
   toEmail: process.env.TO_EMAIL || "alokkmishra06@gmail.com",
