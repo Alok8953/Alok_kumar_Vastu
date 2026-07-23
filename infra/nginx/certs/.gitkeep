@@ -1,0 +1,8 @@
+# Place SSL certificate files here before starting docker-compose.prod.yml:
+# - fullchain.pem
+# - privkey.pem
+#
+# Example (Let's Encrypt on the server):
+#   certbot certonly --standalone -d yourdomain.com -d www.yourdomain.com
+#   cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem ./fullchain.pem
+#   cp /etc/letsencrypt/live/yourdomain.com/privkey.pem ./privkey.pem

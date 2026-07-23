@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#141820"/>
+      <stop offset="100%" stop-color="#283038"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="80" y1="50" x2="320" y2="190" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f0d78a"/>
+      <stop offset="100%" stop-color="#a67c2a"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="240" fill="url(#bg)"/>
+  <rect x="118" y="58" width="164" height="124" rx="12" stroke="url(#gold)" stroke-width="2" fill="rgba(200,155,60,0.06)"/>
+  <path d="M118 98 H282 M118 138 H282 M159 58 V182 M241 58 V182" stroke="#c89b3c" stroke-width="1" opacity="0.35"/>
+  <rect x="132" y="72" width="18" height="18" rx="4" stroke="#f0d78a" stroke-width="1.5" fill="rgba(240,215,138,0.12)"/>
+  <path d="M136 81 L144 89 L152 75" stroke="#f0d78a" stroke-width="1.5" stroke-linecap="round"/>
+  <rect x="132" y="112" width="18" height="18" rx="4" stroke="#f0d78a" stroke-width="1.5" fill="rgba(240,215,138,0.12)"/>
+  <path d="M136 121 L144 129 L152 115" stroke="#f0d78a" stroke-width="1.5" stroke-linecap="round"/>
+  <rect x="132" y="152" width="18" height="18" rx="4" stroke="#e8c766" stroke-width="1.5" fill="rgba(240,215,138,0.08)"/>
+  <path d="M168 82 H250 M168 102 H238 M168 122 H244" stroke="#e8c766" stroke-width="2" stroke-linecap="round"/>
+</svg>

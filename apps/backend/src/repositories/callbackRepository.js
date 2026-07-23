@@ -2,30 +2,33 @@ import { getPool } from "../db/pool.js";
 
 export async function createCallbackRequest({
   userId,
-  propertyType,
+  propertyTypes,
   primaryConcerns,
   concernDetail,
   propertyLocation,
   hasFloorPlan,
   preferredTimeSlot,
   consultationMethod,
+  consultationContactNumber,
   referralSource
 }) {
   const { rows } = await getPool().query(
     `INSERT INTO callback_requests (
-       user_id, property_type, primary_concerns, concern_detail, property_location,
-       has_floor_plan, preferred_time_slot, consultation_method, referral_source
-     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       user_id, property_types, primary_concerns, concern_detail, property_location,
+       has_floor_plan, preferred_time_slot, consultation_method, consultation_contact_number,
+       referral_source
+     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING id, user_id, status, created_at`,
     [
       userId,
-      propertyType,
+      propertyTypes,
       primaryConcerns,
       concernDetail,
       propertyLocation,
       hasFloorPlan,
       preferredTimeSlot,
       consultationMethod,
+      consultationContactNumber,
       referralSource || null
     ]
   );
@@ -63,19 +66,21 @@ export async function createCallbackWithUser(client, userData, callbackData) {
 
   const callbackResult = await client.query(
     `INSERT INTO callback_requests (
-       user_id, property_type, primary_concerns, concern_detail, property_location,
-       has_floor_plan, preferred_time_slot, consultation_method, referral_source
-     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       user_id, property_types, primary_concerns, concern_detail, property_location,
+       has_floor_plan, preferred_time_slot, consultation_method, consultation_contact_number,
+       referral_source
+     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING id, status, created_at`,
     [
       userId,
-      callbackData.propertyType,
+      callbackData.propertyTypes,
       callbackData.primaryConcerns,
       callbackData.concernDetail,
       callbackData.propertyLocation,
       callbackData.hasFloorPlan,
       callbackData.preferredTimeSlot,
       callbackData.consultationMethod,
+      callbackData.consultationContactNumber,
       callbackData.referralSource || null
     ]
   );

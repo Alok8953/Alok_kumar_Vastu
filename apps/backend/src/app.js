@@ -1,31 +1,25 @@
 import express from "express";
 import cors from "cors";
 import { env } from "./config/env.js";
+import { corsOrigin } from "./config/cors.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import callbackRoutes from "./routes/callbackRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import adminReviewRoutes from "./routes/adminReviewRoutes.js";
+import { attachFrontend, defaultFrontendDistPath } from "./middlewares/serveFrontend.js";
 import { notFound } from "./middlewares/notFound.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
-
-const DEV_ORIGINS = [
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  env.frontendOrigin
-];
 
 export function createApp() {
   const app = express();
 
+  if (env.nodeEnv === "production") {
+    app.set("trust proxy", 1);
+  }
+
   app.use(
     cors({
-      origin(origin, callback) {
-        if (!origin || DEV_ORIGINS.includes(origin)) {
-          callback(null, true);
-        } else {
-          callback(null, env.frontendOrigin);
-        }
-      },
+      origin: corsOrigin,
       methods: ["GET", "POST", "PATCH", "OPTIONS"],
       allowedHeaders: ["Content-Type", "X-Admin-Key"]
     })
@@ -36,6 +30,19 @@ export function createApp() {
   app.use("/api", callbackRoutes);
   app.use("/api", reviewRoutes);
   app.use("/api/admin", adminReviewRoutes);
+
+  if (env.serveFrontend) {
+    attachFrontend(app, { distPath: defaultFrontendDistPath() });
+  } else {
+    app.get("*", (req, res, next) => {
+      if (req.path.startsWith("/api")) {
+        next();
+        return;
+      }
+      res.redirect(`${env.frontendOrigin}${req.originalUrl}`);
+    });
+  }
+
   app.use(notFound);
   app.use(errorHandler);
 

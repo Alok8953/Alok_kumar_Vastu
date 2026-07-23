@@ -31,7 +31,7 @@ const TIME_SLOTS = [
   "7:00 PM – 9:00 PM"
 ];
 
-const CONSULTATION_METHODS = ["Phone Call", "WhatsApp Call", "Google Meet / Zoom"];
+const CONSULTATION_METHODS = ["Phone Call", "WhatsApp Call"];
 
 const REFERRAL_SOURCES = [
   "Google Search",
@@ -42,13 +42,33 @@ const REFERRAL_SOURCES = [
   "Other"
 ];
 
+const PHONE_DIGIT_LIMIT = 10;
+
+function sanitizePhoneDigits(value) {
+  return String(value ?? "").replace(/\D/g, "").slice(0, PHONE_DIGIT_LIMIT);
+}
+
+function isValidPhoneDigits(value) {
+  return sanitizePhoneDigits(value).length === PHONE_DIGIT_LIMIT;
+}
+
+function parsePropertyTypes(body) {
+  if (Array.isArray(body.propertyTypes)) {
+    return body.propertyTypes.filter((t) => typeof t === "string" && t.trim());
+  }
+  if (typeof body.propertyType === "string" && body.propertyType.trim()) {
+    return [body.propertyType.trim()];
+  }
+  return [];
+}
+
 export function validateCallbackBody(body) {
   const errors = [];
 
   const fullName = body.fullName?.trim();
-  const mobile = body.mobile?.trim();
+  const mobile = sanitizePhoneDigits(body.mobile);
   const email = body.email?.trim() || null;
-  const propertyType = body.propertyType?.trim();
+  const propertyTypes = parsePropertyTypes(body);
   const primaryConcerns = Array.isArray(body.primaryConcerns)
     ? body.primaryConcerns.filter((c) => typeof c === "string" && c.trim())
     : [];
@@ -61,8 +81,13 @@ export function validateCallbackBody(body) {
 
   if (!fullName) errors.push("Full Name is required.");
   if (!mobile) errors.push("Mobile Number is required.");
-  if (!propertyType || !PROPERTY_TYPES.includes(propertyType)) {
-    errors.push("Property Type is required.");
+  else if (!isValidPhoneDigits(mobile)) {
+    errors.push(`Mobile number must be exactly ${PHONE_DIGIT_LIMIT} digits.`);
+  }
+  if (propertyTypes.length === 0) {
+    errors.push("Select at least one property type.");
+  } else if (!propertyTypes.every((t) => PROPERTY_TYPES.includes(t.trim()))) {
+    errors.push("Invalid property type selected.");
   }
   if (primaryConcerns.length === 0) {
     errors.push("Select at least one primary concern.");
@@ -80,6 +105,21 @@ export function validateCallbackBody(body) {
   if (!consultationMethod || !CONSULTATION_METHODS.includes(consultationMethod)) {
     errors.push("Preferred Consultation Method is required.");
   }
+
+  const consultationContactNumber = sanitizePhoneDigits(body.consultationContactNumber);
+  if (consultationMethod === "Phone Call") {
+    if (!consultationContactNumber) {
+      errors.push("Phone number for callback is required.");
+    } else if (!isValidPhoneDigits(consultationContactNumber)) {
+      errors.push(`Phone number for callback must be exactly ${PHONE_DIGIT_LIMIT} digits.`);
+    }
+  } else if (consultationMethod === "WhatsApp Call") {
+    if (!consultationContactNumber) {
+      errors.push("WhatsApp number is required.");
+    } else if (!isValidPhoneDigits(consultationContactNumber)) {
+      errors.push(`WhatsApp number must be exactly ${PHONE_DIGIT_LIMIT} digits.`);
+    }
+  }
   if (referralSource && !REFERRAL_SOURCES.includes(referralSource)) {
     errors.push("Invalid referral source.");
   }
@@ -94,13 +134,14 @@ export function validateCallbackBody(body) {
       fullName,
       mobile,
       email,
-      propertyType,
+      propertyTypes: propertyTypes.map((t) => t.trim()),
       primaryConcerns: primaryConcerns.map((c) => c.trim()),
       concernDetail,
       propertyLocation,
       hasFloorPlan,
       preferredTimeSlot,
       consultationMethod,
+      consultationContactNumber,
       referralSource
     }
   };

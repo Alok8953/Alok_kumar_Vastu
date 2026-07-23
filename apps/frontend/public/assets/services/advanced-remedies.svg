@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#221810"/>
+      <stop offset="100%" stop-color="#3a2818"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="100" y1="40" x2="300" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f0d78a"/>
+      <stop offset="100%" stop-color="#a67c2a"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="240" fill="url(#bg)"/>
+  <polygon points="200,52 248,88 232,148 168,148 152,88" stroke="url(#gold)" stroke-width="2" fill="rgba(200,155,60,0.08)"/>
+  <polygon points="200,72 228,96 218,132 182,132 172,96" stroke="#c89b3c" stroke-width="1.2" fill="rgba(200,155,60,0.05)"/>
+  <circle cx="200" cy="104" r="16" stroke="#f0d78a" stroke-width="1.5" fill="rgba(240,215,138,0.12)"/>
+  <path d="M200 88 L200 120 M184 104 L216 104" stroke="#e8c766" stroke-width="1.5"/>
+  <path d="M200 148 L200 176 M176 162 L224 162" stroke="#c89b3c" stroke-width="1" opacity="0.45"/>
+  <circle cx="200" cy="188" r="6" fill="#f0d78a" opacity="0.8"/>
+</svg>

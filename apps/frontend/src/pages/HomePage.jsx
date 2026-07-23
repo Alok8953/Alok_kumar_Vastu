@@ -1,20 +1,13 @@
 import { WHATSAPP_URL } from "../constants/contact.js";
-import { CTA_BUTTON_LABEL } from "../constants/siteContent.js";
-import { Accordion } from "../components/Accordion.jsx";
+import { WhatsAppGlyph } from "../components/WhatsAppIcon.jsx";
+import { CTA_BUTTON_LABEL, HERO_FOCUS_AREAS } from "../constants/siteContent.js";
 import { ParallaxRevealSection } from "../components/ParallaxRevealSection.jsx";
 import { CredentialsBanner } from "../components/sections/CredentialsBanner";
-import { TestimonialsSection } from "../components/sections/TestimonialsSection";
-import { ConsultationProcessSection } from "../components/sections/ConsultationProcessSection";
-import {
-  buildAboutAccordionItems,
-  buildFrameworkAccordionItems,
-  buildPositioningAccordionItems,
-  buildServicesAccordionItems,
-  buildSpecializedAccordionItems,
-  buildWhyAccordionItems
-} from "../lib/accordionContent.jsx";
+import { FrameworkLayerCards } from "../components/sections/FrameworkLayerCards.jsx";
+import { SpecializedServiceCards } from "../components/sections/SpecializedServiceCards.jsx";
+import { WhyDifferentiatorCards } from "../components/sections/WhyDifferentiatorCards.jsx";
 
-export function HomePage({ onOpenModal, onOpenReview }) {
+export function HomePage({ onOpenModal, onOpenServices }) {
   return (
     <main id="main-content">
       <section className="hero section panel" id="home">
@@ -40,18 +33,17 @@ export function HomePage({ onOpenModal, onOpenReview }) {
               </p>
               <CredentialsBanner />
               <div className="micro-grid">
-                <span>Career & Financial Growth</span>
-                <span>Relationships & Stability</span>
-                <span>Business Direction</span>
-                <span>Mental Clarity</span>
+                {HERO_FOCUS_AREAS.map((label) => (
+                  <span key={label}>{label}</span>
+                ))}
               </div>
               <div className="cta-row" id="book">
                 <button className="btn btn-primary" onClick={onOpenModal}>
                   {CTA_BUTTON_LABEL}
                 </button>
-                <a className="btn btn-outline" href="#services">
+                <button type="button" className="btn btn-outline" onClick={onOpenServices}>
                   Explore Services
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -59,57 +51,16 @@ export function HomePage({ onOpenModal, onOpenReview }) {
       </section>
 
       <ParallaxRevealSection
-        id="about"
-        kicker="About The Approach"
-        title="Most Problems Are Not Random"
-        intro="Most problems are not random. They are structured patterns caused by wrong decisions, a misaligned environment, and lack of clarity."
-        footer={
-          <div className="stats-grid compact">
-            <article className="stat-card">
-              <h3>4+</h3>
-              <p>Years</p>
-            </article>
-            <article className="stat-card">
-              <h3>100+</h3>
-              <p>Cases</p>
-            </article>
-            <article className="stat-card">
-              <h3>98%</h3>
-              <p>Success</p>
-            </article>
-            <article className="stat-card">
-              <h3>Working Hour</h3>
-              <p>9 AM to 9 PM</p>
-            </article>
-          </div>
-        }
-      >
-        <Accordion items={buildAboutAccordionItems()} />
-      </ParallaxRevealSection>
-
-      <ConsultationProcessSection />
-
-      <ParallaxRevealSection
         id="framework"
         kicker="Core Framework"
-        title="Every solution is built on three layers"
+        title="Three layers. One clear system."
         footer={
-          <div className="highlight-strip">
-            When these three layers align, results stop being uncertain and start becoming{" "}
-            <strong>predictable</strong>.
+          <div className="highlight-strip highlight-strip--compact">
+            Align all three → results become <strong>predictable</strong>.
           </div>
         }
       >
-        <Accordion items={buildFrameworkAccordionItems()} />
-      </ParallaxRevealSection>
-
-      <ParallaxRevealSection
-        id="services"
-        kicker="Services"
-        title="Four core service categories"
-        intro="The process is designed to diagnose the root issue and deliver structured correction, not surface-level advice."
-      >
-        <Accordion items={buildServicesAccordionItems()} />
+        <FrameworkLayerCards />
       </ParallaxRevealSection>
 
       <ParallaxRevealSection
@@ -117,26 +68,11 @@ export function HomePage({ onOpenModal, onOpenReview }) {
         kicker="Specialized Services"
         title="Specialized Vastu & Energy Services"
       >
-        <Accordion items={buildSpecializedAccordionItems()} />
+        <SpecializedServiceCards />
       </ParallaxRevealSection>
-
-      <TestimonialsSection onOpenReview={onOpenReview} />
 
       <ParallaxRevealSection id="why" kicker="Why This Works" title="Five key differentiators">
-        <Accordion items={buildWhyAccordionItems()} />
-      </ParallaxRevealSection>
-
-      <ParallaxRevealSection
-        id="positioning"
-        kicker="Positioning"
-        title="This is not astrology in the traditional sense"
-        footer={
-          <div className="highlight-strip">
-            This is a structured system for clarity, control, and strategic life alignment.
-          </div>
-        }
-      >
-        <Accordion items={buildPositioningAccordionItems()} />
+        <WhyDifferentiatorCards />
       </ParallaxRevealSection>
 
       <section className="cta-band section panel" id="contact">
@@ -150,16 +86,16 @@ export function HomePage({ onOpenModal, onOpenReview }) {
             </p>
           </div>
           <div className="cta-row">
-            <button className="btn btn-primary" onClick={onOpenModal}>
-              {CTA_BUTTON_LABEL}
-            </button>
             <a
-              className="btn btn-outline"
+              className="whatsapp-cta"
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="WhatsApp Now"
+              title="WhatsApp Now"
             >
-              WhatsApp
+              <WhatsAppGlyph size={22} className="whatsapp-cta-icon" />
+              <span className="whatsapp-cta-label">WhatsApp Now</span>
             </a>
           </div>
         </div>

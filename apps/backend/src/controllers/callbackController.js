@@ -8,6 +8,36 @@ import { createEmailLog } from "../repositories/emailLogRepository.js";
 import { sendCallbackEmail, isEmailConfigured } from "../services/emailService.js";
 import { validateCallbackBody } from "../utils/validateCallback.js";
 
+const SUCCESS_MESSAGE =
+  "Thank you for your submission! We have received your request. Our team will review your details and contact you during your preferred callback time.";
+
+async function notifyByEmail(callbackId, data) {
+  if (!isEmailConfigured()) {
+    console.warn("Callback saved (id=%s) but email is not configured.", callbackId);
+    return false;
+  }
+
+  try {
+    await sendCallbackEmail(data);
+    await markCallbackEmailSent(callbackId);
+    await createEmailLog({ callbackRequestId: callbackId, status: "sent" });
+    return true;
+  } catch (err) {
+    console.error("Email send error:", err.message);
+    try {
+      await markCallbackEmailFailed(callbackId, err.message);
+      await createEmailLog({
+        callbackRequestId: callbackId,
+        status: "failed",
+        errorMessage: err.message
+      });
+    } catch (logErr) {
+      console.error("Could not log email failure:", logErr.message);
+    }
+    return false;
+  }
+}
+
 export async function callbackController(req, res) {
   const validation = validateCallbackBody(req.body);
 
@@ -16,13 +46,13 @@ export async function callbackController(req, res) {
   }
 
   const data = validation.data;
-
   const pool = getPool();
-  const client = await pool.connect();
+  let client;
 
   let callbackId;
 
   try {
+    client = await pool.connect();
     await client.query("BEGIN");
 
     const result = await createCallbackWithUser(
@@ -33,58 +63,41 @@ export async function callbackController(req, res) {
         email: data.email
       },
       {
-        propertyType: data.propertyType,
+        propertyTypes: data.propertyTypes,
         primaryConcerns: data.primaryConcerns,
         concernDetail: data.concernDetail,
         propertyLocation: data.propertyLocation,
         hasFloorPlan: data.hasFloorPlan,
         preferredTimeSlot: data.preferredTimeSlot,
         consultationMethod: data.consultationMethod,
+        consultationContactNumber: data.consultationContactNumber,
         referralSource: data.referralSource
       }
     );
 
     callbackId = result.callbackRequest.id;
-
     await client.query("COMMIT");
   } catch (err) {
-    await client.query("ROLLBACK");
+    if (client) {
+      try {
+        await client.query("ROLLBACK");
+      } catch {
+        /* ignore rollback failure */
+      }
+    }
     console.error("Database save error:", err.message);
     return res.status(503).json({
       error: "Could not save your request. Please check that PostgreSQL is running and try again."
     });
   } finally {
-    client.release();
+    client?.release();
   }
 
-  if (!isEmailConfigured()) {
-    return res.status(503).json({
-      error:
-        "Email service is not set up yet. Please add your Gmail App Password in backend/.env and restart the server."
-    });
-  }
+  const emailSent = await notifyByEmail(callbackId, data);
 
-  try {
-    await sendCallbackEmail(data);
-    await markCallbackEmailSent(callbackId);
-    await createEmailLog({ callbackRequestId: callbackId, status: "sent" });
-
-    return res.status(200).json({
-      message:
-        "Thank you for your submission! We have received your request. Our team will review your details and contact you during your preferred callback time.",
-      id: callbackId
-    });
-  } catch (err) {
-    console.error("Email send error:", err.message);
-    await markCallbackEmailFailed(callbackId, err.message);
-    await createEmailLog({
-      callbackRequestId: callbackId,
-      status: "failed",
-      errorMessage: err.message
-    });
-
-    return res.status(500).json({
-      error: "Could not send email. Check Gmail App Password in backend/.env and try again."
-    });
-  }
+  return res.status(200).json({
+    message: SUCCESS_MESSAGE,
+    id: callbackId,
+    emailSent
+  });
 }

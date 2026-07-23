@@ -1,3 +1,13 @@
+export const PHONE_DIGIT_LIMIT = 10;
+
+export function sanitizePhoneDigits(value) {
+  return String(value ?? "").replace(/\D/g, "").slice(0, PHONE_DIGIT_LIMIT);
+}
+
+export function isValidPhoneDigits(value) {
+  return sanitizePhoneDigits(value).length === PHONE_DIGIT_LIMIT;
+}
+
 export const PROPERTY_TYPES = [
   "House / Home",
   "Apartment / Flat",
@@ -31,7 +41,9 @@ export const TIME_SLOTS = [
   "7:00 PM – 9:00 PM"
 ];
 
-export const CONSULTATION_METHODS = ["Phone Call", "WhatsApp Call", "Google Meet / Zoom"];
+export const CONSULTATION_METHODS = ["Phone Call", "WhatsApp Call"];
+export const CONSULTATION_METHOD_PHONE = "Phone Call";
+export const CONSULTATION_METHOD_WHATSAPP = "WhatsApp Call";
 
 export const REFERRAL_SOURCES = [
   "Google Search",
@@ -46,12 +58,14 @@ export const INITIAL_FORM = {
   fullName: "",
   mobile: "",
   email: "",
-  propertyType: "",
+  propertyTypes: [],
   primaryConcerns: [],
   concernDetail: "",
   propertyLocation: "",
   hasFloorPlan: "",
   preferredTimeSlot: "",
   consultationMethod: "",
+  consultationContactNumber: "",
+  useSameMobileForContact: false,
   referralSource: ""
 };

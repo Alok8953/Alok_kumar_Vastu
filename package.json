@@ -7,11 +7,16 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace @app/backend\" \"npm run dev --workspace @app/frontend\"",
+    "dev": "node scripts/start-dev.mjs",
+    "dev:inner": "concurrently \"npm run dev --workspace @app/backend\" \"npm run dev --workspace @app/frontend\"",
     "dev:frontend": "npm run dev --workspace @app/frontend",
     "dev:backend": "npm run dev --workspace @app/backend",
-    "build": "npm run build --workspace @app/frontend",
-    "start": "npm run start --workspace @app/backend"
+    "build": "node scripts/build-production.mjs",
+    "build:frontend": "npm run build --workspace @app/frontend",
+    "start:prod": "npm run start --workspace @app/backend",
+    "prepare:hosting": "powershell -ExecutionPolicy Bypass -File scripts/prepare-hosting.ps1",
+    "docker:prod": "docker compose -f infra/docker-compose.prod.yml --env-file apps/backend/.env up -d --build",
+    "docker:simple": "docker compose -f infra/docker-compose.simple.yml --env-file apps/backend/.env up -d --build"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

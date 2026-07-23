@@ -1,10 +1,7 @@
 import {
   ABOUT_POINTS,
   CONSULTATION_STEPS,
-  FRAMEWORK_LAYERS,
-  POSITIONING_POINTS,
   SERVICE_CATEGORIES,
-  SPECIALIZED_SERVICES,
   TESTIMONIALS,
   WHY_DIFFERENTIATORS
 } from "../constants/siteContent.js";
@@ -26,20 +23,6 @@ export function buildAboutAccordionItems() {
   }));
 }
 
-export function buildFrameworkAccordionItems() {
-  return FRAMEWORK_LAYERS.map((item) => ({
-    id: item.id,
-    title: item.title,
-    content: (
-      <ul className="accordion-list">
-        {item.bullets.map((bullet) => (
-          <li key={bullet}>{bullet}</li>
-        ))}
-      </ul>
-    )
-  }));
-}
-
 export function buildServicesAccordionItems() {
   return SERVICE_CATEGORIES.map((item) => ({
     id: item.id,
@@ -55,24 +38,8 @@ export function buildServicesAccordionItems() {
   }));
 }
 
-export function buildSpecializedAccordionItems() {
-  return SPECIALIZED_SERVICES.map((item) => ({
-    id: item.id,
-    title: item.title,
-    content: <p>{item.body}</p>
-  }));
-}
-
 export function buildWhyAccordionItems() {
   return WHY_DIFFERENTIATORS.map((item) => ({
-    id: item.id,
-    title: item.title,
-    content: <p>{item.body}</p>
-  }));
-}
-
-export function buildPositioningAccordionItems() {
-  return POSITIONING_POINTS.map((item) => ({
     id: item.id,
     title: item.title,
     content: <p>{item.body}</p>

@@ -1,18 +1,26 @@
 import { useEffect, useState } from "react";
 import { SiteHeader } from "../components/layout/SiteHeader";
 import { SiteFooter } from "../components/layout/SiteFooter";
+import { FooterExpandableBand } from "../components/layout/FooterExpandableBand";
 import { HomePage } from "../pages/HomePage";
 import { AdminReviewsPage } from "../pages/AdminReviewsPage";
 import { CallbackModal } from "../components/CallbackModal";
 import { ReviewModal } from "../components/ReviewModal";
+import { ServicesDrawer } from "../components/ServicesDrawer";
+import { AboutDrawer } from "../components/AboutDrawer";
 import { WhatsAppButton } from "../components/WhatsAppButton";
+import {
+  clearDrawerHash,
+  getDrawerFromHash,
+  getHashId,
+  isDrawerHash,
+  setHash
+} from "../lib/hashRouting.js";
 
 const navItems = [
   { href: "#home", label: "Home" },
-  { href: "#about", label: "About" },
-  { href: "#process", label: "Process" },
-  { href: "#services", label: "Services" },
-  { href: "#testimonials", label: "Stories" },
+  { type: "about", label: "About" },
+  { type: "services", label: "Services" },
   { href: "#contact", label: "Contact" }
 ];
 
@@ -22,18 +30,36 @@ function getAdminRoute() {
 }
 
 export function App() {
-  const [adminRoute, setAdminRoute] = useState(getAdminRoute);
+  const [adminRoute, setAdminRoute] = useState(() => getAdminRoute());
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeId, setActiveId] = useState("home");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [activeDrawer, setActiveDrawer] = useState(() => getDrawerFromHash());
 
   useEffect(() => {
-    function onHashChange() {
+    function syncHashRoute() {
       setAdminRoute(getAdminRoute());
+
+      const drawerId = getDrawerFromHash();
+      setActiveDrawer(drawerId);
+
+      if (!drawerId) {
+        const hashId = getHashId();
+        if (hashId) {
+          requestAnimationFrame(() => {
+            document.getElementById(hashId)?.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+          });
+        }
+      }
     }
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
+
+    syncHashRoute();
+    window.addEventListener("hashchange", syncHashRoute);
+    return () => window.removeEventListener("hashchange", syncHashRoute);
   }, []);
 
   function openModal() {
@@ -46,8 +72,23 @@ export function App() {
     setIsMenuOpen(false);
   }
 
+  function handleOpenDrawer(id) {
+    setActiveDrawer(id);
+    setHash(id);
+    setIsMenuOpen(false);
+  }
+
+  function closeDrawer() {
+    setActiveDrawer(null);
+    if (isDrawerHash()) {
+      clearDrawerHash();
+    }
+  }
+
   useEffect(() => {
-    const sections = Array.from(document.querySelectorAll("main section[id], header[id]"));
+    const sections = Array.from(
+      document.querySelectorAll("main section[id], header[id], .footer-collapsible[id]")
+    );
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -86,9 +127,17 @@ export function App() {
         activeId={activeId}
         navItems={navItems}
         onOpenModal={openModal}
+        activeDrawer={activeDrawer}
+        onOpenDrawer={handleOpenDrawer}
       />
-      <HomePage onOpenModal={openModal} onOpenReview={openReview} />
-      <SiteFooter />
+      <HomePage onOpenModal={openModal} onOpenServices={() => handleOpenDrawer("services")} />
+      <FooterExpandableBand onOpenReview={openReview} />
+      <SiteFooter
+        onOpenAbout={() => handleOpenDrawer("about")}
+        onOpenServices={() => handleOpenDrawer("services")}
+      />
+      <AboutDrawer isOpen={activeDrawer === "about"} onClose={closeDrawer} />
+      <ServicesDrawer isOpen={activeDrawer === "services"} onClose={closeDrawer} />
       <CallbackModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       <ReviewModal isOpen={isReviewOpen} onClose={() => setIsReviewOpen(false)} />
       <WhatsAppButton />

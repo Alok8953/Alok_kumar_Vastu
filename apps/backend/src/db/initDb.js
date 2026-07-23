@@ -18,13 +18,14 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS callback_requests (
   id SERIAL PRIMARY KEY,
   user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  property_type VARCHAR(100) NOT NULL,
+  property_types TEXT[] NOT NULL,
   primary_concerns TEXT[] NOT NULL,
   concern_detail TEXT NOT NULL,
   property_location VARCHAR(255) NOT NULL,
   has_floor_plan BOOLEAN NOT NULL,
   preferred_time_slot VARCHAR(50) NOT NULL,
   consultation_method VARCHAR(50) NOT NULL,
+  consultation_contact_number VARCHAR(20),
   referral_source VARCHAR(100),
   status VARCHAR(50) NOT NULL DEFAULT 'new',
   email_sent_at TIMESTAMPTZ,
@@ -138,13 +139,13 @@ async function migrateLegacyCallbackTable(pool) {
 
     await pool.query(
       `INSERT INTO callback_requests (
-         user_id, property_type, primary_concerns, concern_detail, property_location,
+         user_id, property_types, primary_concerns, concern_detail, property_location,
          has_floor_plan, preferred_time_slot, consultation_method, referral_source,
          status, email_sent_at, email_error, created_at, updated_at
        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13)`,
       [
         userResult.rows[0].id,
-        "Other",
+        ["Other"],
         ["General Vastu Consultation"],
         row.problem,
         row.place,
@@ -166,7 +167,9 @@ async function migrateLegacyCallbackTable(pool) {
 }
 
 export async function initDatabase() {
-  await ensureDatabaseExists();
+  if (!env.db.skipAutoCreate) {
+    await ensureDatabaseExists();
+  }
 
   const pool = getPool();
 
@@ -177,12 +180,49 @@ export async function initDatabase() {
 
   if (legacyColumns.length > 0) {
     await migrateLegacyCallbackTable(pool);
+    await ensurePropertyTypesColumn(pool);
+    await ensureConsultationContactNumberColumn(pool);
     await ensureReviewApproveTokens(pool);
     return;
   }
 
   await pool.query(SCHEMA_SQL);
+  await ensurePropertyTypesColumn(pool);
+  await ensureConsultationContactNumberColumn(pool);
   await ensureReviewApproveTokens(pool);
+}
+
+async function ensureConsultationContactNumberColumn(pool) {
+  await pool.query(`
+    ALTER TABLE callback_requests
+    ADD COLUMN IF NOT EXISTS consultation_contact_number VARCHAR(20)
+  `);
+}
+
+async function ensurePropertyTypesColumn(pool) {
+  await pool.query(`
+    ALTER TABLE callback_requests
+    ADD COLUMN IF NOT EXISTS property_types TEXT[]
+  `);
+
+  const { rows } = await pool.query(`
+    SELECT column_name FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'callback_requests'
+      AND column_name IN ('property_type', 'property_types')
+  `);
+  const cols = new Set(rows.map((r) => r.column_name));
+
+  if (cols.has("property_type") && cols.has("property_types")) {
+    await pool.query(`
+      UPDATE callback_requests
+      SET property_types = ARRAY[property_type]
+      WHERE property_types IS NULL AND property_type IS NOT NULL
+    `);
+    await pool.query(`
+      ALTER TABLE callback_requests
+      ALTER COLUMN property_type DROP NOT NULL
+    `);
+  }
 }
 
 async function ensureReviewApproveTokens(pool) {

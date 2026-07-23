@@ -1,10 +1,18 @@
-export const CTA_BUTTON_LABEL = "Free Vastu Audit Checklist PDF";
+export const CTA_BUTTON_LABEL = "Free Vastu Audit Checklist";
 
 export const CREDENTIALS = [
   "100+ Consultations",
   "4+ Years Experience",
   "Personalized Vastu Solutions",
   "Online & Offline Consultation"
+];
+
+/** Shown once — hero focus pills (detailed services live in Services drawer). */
+export const HERO_FOCUS_AREAS = [
+  "Career & Financial Growth",
+  "Relationships & Stability",
+  "Business Direction",
+  "Mental Clarity"
 ];
 
 export const CONSULTATION_STEPS = [
@@ -67,22 +75,24 @@ export const ABOUT_POINTS = [
 export const FRAMEWORK_LAYERS = [
   {
     id: "framework-mindset",
-    title: "1. Mindset & Decision Intelligence",
-    bullets: [
-      "How you process situations",
-      "Where judgment falls",
-      "Why mistakes repeat"
-    ]
+    step: "01",
+    title: "Mindset",
+    tagline: "Think clear before you act",
+    bullets: ["Sharp judgment", "Stop repeat mistakes", "Confident decisions"]
   },
   {
     id: "framework-energy",
-    title: "2. Energy Alignment",
-    bullets: ["Space alignment", "Planetary influences", "Directional balance"]
+    step: "02",
+    title: "Energy",
+    tagline: "Space & direction in sync",
+    bullets: ["Vastu alignment", "Directional balance", "Stable energy flow"]
   },
   {
     id: "framework-action",
-    title: "3. Action Framework",
-    bullets: ["Exact steps to follow", "What to do/avoid", "How to maintain consistency"]
+    step: "03",
+    title: "Action",
+    tagline: "Exact steps — not generic tips",
+    bullets: ["What to do next", "What to avoid", "Stay consistent"]
   }
 ];
 
@@ -114,76 +124,130 @@ export const SERVICE_CATEGORIES = [
 ];
 
 export const SPECIALIZED_SERVICES = [
-  { id: "spec-basic", title: "Basic Vastu", body: "Space correction for stability." },
-  { id: "spec-numero", title: "Numero Vastu", body: "Number alignment with environment." },
-  { id: "spec-astro", title: "Astro Vastu", body: "Planetary and spatial alignment." },
+  {
+    id: "spec-basic",
+    title: "Basic Vastu",
+    tagline: "Home & office space correction",
+    body: "Space correction for stability.",
+    image: "/assets/services/basic-vastu.svg"
+  },
+  {
+    id: "spec-numero",
+    title: "Numero Vastu",
+    tagline: "Numbers aligned with your space",
+    body: "Number alignment with environment.",
+    image: "/assets/services/numero-vastu.svg"
+  },
+  {
+    id: "spec-astro",
+    title: "Astro Vastu",
+    tagline: "Planets + directions in sync",
+    body: "Planetary and spatial alignment.",
+    image: "/assets/services/astro-vastu.svg"
+  },
   {
     id: "spec-devta",
     title: "Devta Energy Activation",
-    body: "Strengthening directional energies."
+    tagline: "Directional energies strengthened",
+    body: "Strengthening directional energies.",
+    image: "/assets/services/devta-energy.svg"
   },
-  { id: "spec-remedies", title: "Advanced Remedies", body: "Root-cause-based corrections." },
-  { id: "spec-industrial", title: "Industrial Vastu", body: "Business and factory alignment." }
+  {
+    id: "spec-remedies",
+    title: "Advanced Remedies",
+    tagline: "Root-cause based corrections",
+    body: "Root-cause-based corrections.",
+    image: "/assets/services/advanced-remedies.svg"
+  },
+  {
+    id: "spec-industrial",
+    title: "Industrial Vastu",
+    tagline: "Factory & business alignment",
+    body: "Business and factory alignment.",
+    image: "/assets/services/industrial-vastu.svg"
+  }
 ];
 
 export const WHY_DIFFERENTIATORS = [
   {
     id: "why-experience",
     title: "Experience-Driven",
-    body: "4+ years of real case work and pattern-based understanding."
+    tagline: "Real cases, proven patterns",
+    body: "Built on real case work and repeatable pattern-based understanding.",
+    image: "/assets/why/experience-driven.svg"
   },
   {
     id: "why-root",
     title: "Root Cause Focus",
-    body: "Works on the actual issue, not surface-level symptoms."
+    tagline: "Fix the source, not symptoms",
+    body: "Works on the actual issue, not surface-level symptoms.",
+    image: "/assets/why/root-cause.svg"
   },
   {
     id: "why-personalized",
-    title: "Fully Personalized",
-    body: "Solutions are based on your unique life and environment."
+    title: "Structured Method",
+    tagline: "Clear steps — not generic tips",
+    body: "A clear framework for your space, timing, and decisions — not generic tips.",
+    image: "/assets/why/structured-method.svg"
   },
   {
     id: "why-longterm",
     title: "Long-Term Results",
-    body: "Designed for lasting stability and measurable growth."
+    tagline: "Stability that lasts",
+    body: "Designed for lasting stability and measurable growth.",
+    image: "/assets/why/long-term-results.svg"
   },
   {
     id: "why-support",
-    title: "Online & Offline Support",
-    body: "Consultations available in person and remotely for your convenience."
+    title: "Flexible Sessions",
+    tagline: "In-person or remote — same quality",
+    body: "In-person or remote — structured the same way so nothing is lost.",
+    image: "/assets/why/flexible-sessions.svg"
   }
 ];
 
 export const POSITIONING_POINTS = [
   {
     id: "pos-1",
-    title: "Not about telling what will happen.",
-    body: "Guidance focuses on why patterns exist and what to change — not vague predictions."
+    title: "No Predictions",
+    tagline: "Why patterns exist — not vague forecasts",
+    body: "Guidance focuses on why patterns exist and what to change — not vague predictions.",
+    image: "/assets/approach/no-predictions.svg"
   },
   {
     id: "pos-2",
-    title: "Understand why your current situation exists.",
-    body: "We map mindset, environment, and timing together to explain repeating blocks."
+    title: "Understand Your Situation",
+    tagline: "Map mindset, space & timing together",
+    body: "We map mindset, environment, and timing together to explain repeating blocks.",
+    image: "/assets/approach/understand-situation.svg"
   },
   {
     id: "pos-3",
-    title: "Identify what is misaligned.",
-    body: "Direction, placement, and decision patterns are checked with precision."
+    title: "Find Misalignment",
+    tagline: "Direction & placement checked precisely",
+    body: "Direction, placement, and decision patterns are checked with precision.",
+    image: "/assets/approach/find-misalignment.svg"
   },
   {
     id: "pos-4",
-    title: "Correct what needs correction.",
-    body: "Remedies are practical, prioritized, and suited to your space and goals."
+    title: "Targeted Correction",
+    tagline: "Practical remedies for your space",
+    body: "Remedies are practical, prioritized, and suited to your space and goals.",
+    image: "/assets/approach/targeted-correction.svg"
   },
   {
     id: "pos-5",
-    title: "Define exact actions that create change.",
-    body: "You leave with clear steps — what to do, what to avoid, and in what order."
+    title: "Clear Action Plan",
+    tagline: "What to do, avoid & in what order",
+    body: "You leave with clear steps — what to do, what to avoid, and in what order.",
+    image: "/assets/approach/clear-action-plan.svg"
   },
   {
     id: "pos-6",
-    title: "Maintain consistency for sustainable results.",
-    body: "Follow-up keeps alignment strong as life and business evolve."
+    title: "Stay Consistent",
+    tagline: "Follow-up for lasting alignment",
+    body: "Follow-up keeps alignment strong as life and business evolve.",
+    image: "/assets/approach/stay-consistent.svg"
   }
 ];
 

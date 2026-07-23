@@ -2,24 +2,49 @@ import { useEffect, useRef, useState } from "react";
 import { postApi } from "../lib/postApi.js";
 import {
   CONSULTATION_METHODS,
+  CONSULTATION_METHOD_PHONE,
+  CONSULTATION_METHOD_WHATSAPP,
   INITIAL_FORM,
+  isValidPhoneDigits,
+  PHONE_DIGIT_LIMIT,
   PRIMARY_CONCERNS,
   PROPERTY_TYPES,
   REFERRAL_SOURCES,
+  sanitizePhoneDigits,
   TIME_SLOTS
 } from "../constants/callbackFormOptions.js";
+
+function phoneValidationMessage(label) {
+  return `${label} must be exactly ${PHONE_DIGIT_LIMIT} digits.`;
+}
 
 function validateForm(form) {
   const errors = [];
   if (!form.fullName.trim()) errors.push("Full Name is required.");
   if (!form.mobile.trim()) errors.push("Mobile Number is required.");
-  if (!form.propertyType) errors.push("Property Type is required.");
+  else if (!isValidPhoneDigits(form.mobile)) {
+    errors.push(phoneValidationMessage("Mobile number"));
+  }
+  if (form.propertyTypes.length === 0) errors.push("Select at least one property type.");
   if (form.primaryConcerns.length === 0) errors.push("Select at least one primary concern.");
   if (!form.concernDetail.trim()) errors.push("Please describe your concern in detail.");
   if (!form.propertyLocation.trim()) errors.push("Property Location is required.");
   if (form.hasFloorPlan === "") errors.push("Floor Plan selection is required.");
   if (!form.preferredTimeSlot) errors.push("Preferred Time for Callback is required.");
   if (!form.consultationMethod) errors.push("Preferred Consultation Method is required.");
+  else if (!form.consultationContactNumber.trim()) {
+    errors.push(
+      form.consultationMethod === CONSULTATION_METHOD_PHONE
+        ? "Phone number for callback is required."
+        : "WhatsApp number is required."
+    );
+  } else if (!isValidPhoneDigits(form.consultationContactNumber)) {
+    errors.push(
+      form.consultationMethod === CONSULTATION_METHOD_PHONE
+        ? phoneValidationMessage("Phone number for callback")
+        : phoneValidationMessage("WhatsApp number")
+    );
+  }
   return errors;
 }
 
@@ -57,6 +82,7 @@ export function CallbackModal({ isOpen, onClose }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [pendingPropertyType, setPendingPropertyType] = useState(null);
   const firstInputRef = useRef(null);
   const overlayRef = useRef(null);
 
@@ -69,6 +95,7 @@ export function CallbackModal({ isOpen, onClose }) {
       setForm(INITIAL_FORM);
       setStatus("idle");
       setErrorMsg("");
+      setPendingPropertyType(null);
     }
     return () => {
       document.body.style.overflow = "";
@@ -85,7 +112,28 @@ export function CallbackModal({ isOpen, onClose }) {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const nextValue =
+      name === "mobile" || name === "consultationContactNumber"
+        ? sanitizePhoneDigits(value)
+        : value;
+    setForm((prev) => {
+      const next = { ...prev, [name]: nextValue };
+      if (name === "mobile" && prev.useSameMobileForContact) {
+        next.consultationContactNumber = nextValue;
+      }
+      if (name === "consultationContactNumber") {
+        next.useSameMobileForContact = false;
+      }
+      return next;
+    });
+  }
+
+  function handleSameAsMobileToggle(checked) {
+    setForm((prev) => ({
+      ...prev,
+      useSameMobileForContact: checked,
+      consultationContactNumber: checked ? sanitizePhoneDigits(prev.mobile) : prev.consultationContactNumber
+    }));
   }
 
   function handleConcernToggle(concern) {
@@ -98,6 +146,49 @@ export function CallbackModal({ isOpen, onClose }) {
           : [...prev.primaryConcerns, concern]
       };
     });
+  }
+
+  function handlePropertyTypeToggle(type) {
+    setForm((prev) => {
+      const exists = prev.propertyTypes.includes(type);
+      if (exists) {
+        return {
+          ...prev,
+          propertyTypes: prev.propertyTypes.filter((t) => t !== type)
+        };
+      }
+      if (prev.propertyTypes.length === 1) {
+        setPendingPropertyType(type);
+        return prev;
+      }
+      return {
+        ...prev,
+        propertyTypes: [...prev.propertyTypes, type]
+      };
+    });
+  }
+
+  function confirmMultiProperty() {
+    if (!pendingPropertyType) return;
+    setForm((prev) => ({
+      ...prev,
+      propertyTypes: [...prev.propertyTypes, pendingPropertyType]
+    }));
+    setPendingPropertyType(null);
+  }
+
+  function cancelMultiProperty() {
+    setPendingPropertyType(null);
+  }
+
+  function handleConsultationMethodChange(e) {
+    const { value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      consultationMethod: value,
+      consultationContactNumber: "",
+      useSameMobileForContact: false
+    }));
   }
 
   async function handleSubmit(e) {
@@ -117,13 +208,14 @@ export function CallbackModal({ isOpen, onClose }) {
       fullName: form.fullName.trim(),
       mobile: form.mobile.trim(),
       email: form.email.trim() || null,
-      propertyType: form.propertyType,
+      propertyTypes: form.propertyTypes,
       primaryConcerns: form.primaryConcerns,
       concernDetail: form.concernDetail.trim(),
       propertyLocation: form.propertyLocation.trim(),
       hasFloorPlan: form.hasFloorPlan === "yes",
       preferredTimeSlot: form.preferredTimeSlot,
       consultationMethod: form.consultationMethod,
+      consultationContactNumber: form.consultationContactNumber.trim(),
       referralSource: form.referralSource || null
     };
 
@@ -204,10 +296,13 @@ export function CallbackModal({ isOpen, onClose }) {
                     id="cb-mobile"
                     name="mobile"
                     type="tel"
+                    inputMode="numeric"
+                    maxLength={PHONE_DIGIT_LIMIT}
                     value={form.mobile}
                     onChange={handleChange}
                     required
                     autoComplete="tel"
+                    placeholder="10-digit mobile number"
                   />
                 </div>
                 <div className="form-group">
@@ -223,20 +318,43 @@ export function CallbackModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              <OptionGroup legend="Property Type" required>
+              <OptionGroup legend="Property Type (select one or more)" required>
                 <div className="option-grid">
                   {PROPERTY_TYPES.map((type) => (
-                    <RadioOption
+                    <CheckboxOption
                       key={type}
-                      name="propertyType"
                       value={type}
                       label={type}
-                      checked={form.propertyType === type}
-                      onChange={handleChange}
+                      checked={form.propertyTypes.includes(type)}
+                      onChange={() => handlePropertyTypeToggle(type)}
                     />
                   ))}
                 </div>
               </OptionGroup>
+
+              {pendingPropertyType ? (
+                <div
+                  className="confirm-dialog"
+                  role="alertdialog"
+                  aria-labelledby="multi-property-title"
+                  aria-describedby="multi-property-desc"
+                >
+                  <p id="multi-property-title" className="confirm-dialog-title">
+                    Are you sure you want Vastu consultation for more than one property?
+                  </p>
+                  <p id="multi-property-desc" className="confirm-dialog-sub">
+                    You selected multiple property types. Confirm to proceed with this selection.
+                  </p>
+                  <div className="confirm-dialog-actions">
+                    <button type="button" className="btn btn-outline" onClick={cancelMultiProperty}>
+                      No
+                    </button>
+                    <button type="button" className="btn btn-primary" onClick={confirmMultiProperty}>
+                      Yes
+                    </button>
+                  </div>
+                </div>
+              ) : null}
 
               <OptionGroup legend="What is your primary concern?" required>
                 <div className="option-grid">
@@ -323,11 +441,71 @@ export function CallbackModal({ isOpen, onClose }) {
                       value={method}
                       label={method}
                       checked={form.consultationMethod === method}
-                      onChange={handleChange}
+                      onChange={handleConsultationMethodChange}
                     />
                   ))}
                 </div>
               </OptionGroup>
+
+              {form.consultationMethod === CONSULTATION_METHOD_PHONE ? (
+                <div className="form-group">
+                  <label htmlFor="cb-consultationPhone">
+                    Phone Number for Callback <span className="required-mark">*</span>
+                  </label>
+                  <label className="same-as-above">
+                    <input
+                      type="checkbox"
+                      checked={form.useSameMobileForContact}
+                      onChange={(e) => handleSameAsMobileToggle(e.target.checked)}
+                      disabled={!isValidPhoneDigits(form.mobile)}
+                    />
+                    <span>Same as above</span>
+                  </label>
+                  <input
+                    id="cb-consultationPhone"
+                    name="consultationContactNumber"
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={PHONE_DIGIT_LIMIT}
+                    value={form.consultationContactNumber}
+                    onChange={handleChange}
+                    required
+                    autoComplete="tel"
+                    placeholder="10-digit phone number"
+                    readOnly={form.useSameMobileForContact}
+                  />
+                </div>
+              ) : null}
+
+              {form.consultationMethod === CONSULTATION_METHOD_WHATSAPP ? (
+                <div className="form-group">
+                  <label htmlFor="cb-consultationWhatsApp">
+                    WhatsApp Number <span className="required-mark">*</span>
+                  </label>
+                  <label className="same-as-above">
+                    <input
+                      type="checkbox"
+                      checked={form.useSameMobileForContact}
+                      onChange={(e) => handleSameAsMobileToggle(e.target.checked)}
+                      disabled={!isValidPhoneDigits(form.mobile)}
+                    />
+                    <span>Same as above</span>
+                  </label>
+                  <input
+                    id="cb-consultationWhatsApp"
+                    name="consultationContactNumber"
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={PHONE_DIGIT_LIMIT}
+                    value={form.consultationContactNumber}
+                    onChange={handleChange}
+                    required
+                    autoComplete="tel"
+                    placeholder="10-digit WhatsApp number"
+                    readOnly={form.useSameMobileForContact}
+                  />
+                </div>
+              ) : null}
 
               <OptionGroup legend="How did you hear about us?">
                 <div className="option-grid option-grid-compact">

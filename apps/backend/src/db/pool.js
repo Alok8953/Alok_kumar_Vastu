@@ -21,6 +21,10 @@ export function getPool() {
       poolConfig.password = env.db.password;
     }
 
+    if (env.db.ssl) {
+      poolConfig.ssl = { rejectUnauthorized: false };
+    }
+
     pool = new Pool(poolConfig);
 
     pool.on("error", (err) => {

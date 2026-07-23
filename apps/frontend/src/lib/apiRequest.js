@@ -32,16 +32,19 @@ export async function apiRequest(path, { method = "GET", body, adminKey } = {}) 
 
   if (text) {
     try {
-      data = JSON.parse(text);
+      const parsed = JSON.parse(text);
+      data = parsed && typeof parsed === "object" ? parsed : {};
     } catch {
       const proxyDown =
+        res.status === 500 ||
         res.status === 502 ||
         res.status === 504 ||
         text.includes("proxy") ||
-        text.includes("ECONNREFUSED");
+        text.includes("ECONNREFUSED") ||
+        text.includes("ECONNRESET");
       if (proxyDown) {
         throw new Error(
-          "Backend is not running. Open a terminal in Vastu_proj and run: npm run dev"
+          "Backend is restarting or not running. Wait a few seconds, then try again. From Vastu_proj run: npm run dev"
         );
       }
       throw new Error(
@@ -51,7 +54,17 @@ export async function apiRequest(path, { method = "GET", body, adminKey } = {}) 
   }
 
   if (!res.ok) {
-    throw new Error(data.error || data.message || "Something went wrong. Please try again.");
+    const detail =
+      data?.error ||
+      data?.message ||
+      (Array.isArray(data?.errors) ? data.errors.join(" ") : "") ||
+      (typeof data?.errors === "string" ? data.errors : "");
+    throw new Error(
+      detail ||
+        (res.status === 500
+          ? "Server error. Restart with: cd Vastu_proj && npm run dev"
+          : `Request failed (${res.status}). Ensure backend is running on port 5000.`)
+    );
   }
 
   return data;

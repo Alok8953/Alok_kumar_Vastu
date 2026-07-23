@@ -17,34 +17,128 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;");
 }
 
+function digitsOnly(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function buildCallbackQuickActions(data) {
+  const contact = escapeHtml(data.consultationContactNumber || data.mobile);
+  const digits = digitsOnly(data.consultationContactNumber || data.mobile);
+
+  if (data.consultationMethod === "WhatsApp Call" && digits) {
+    return `
+      <div style="margin: 0 0 20px; text-align: center;">
+        <a href="https://wa.me/${digits}" style="display: inline-block; background: #25D366; color: #ffffff; text-decoration: none; font-weight: bold; padding: 14px 28px; border-radius: 10px;">
+          Open WhatsApp — ${contact}
+        </a>
+      </div>
+    `;
+  }
+
+  if (data.consultationMethod === "Phone Call" && digits) {
+    return `
+      <div style="margin: 0 0 20px; text-align: center;">
+        <a href="tel:${digits}" style="display: inline-block; background: #b87333; color: #ffffff; text-decoration: none; font-weight: bold; padding: 14px 28px; border-radius: 10px;">
+          Call Client — ${contact}
+        </a>
+      </div>
+    `;
+  }
+
+  return "";
+}
+
+function emailRow(label, value, shaded = false) {
+  const bg = shaded ? ' style="background: #f0f0f0;"' : "";
+  return `
+    <tr${bg}>
+      <td style="padding: 10px 12px; font-weight: bold; width: 210px; vertical-align: top; color: #333;">${label}</td>
+      <td style="padding: 10px 12px; color: #222; vertical-align: top;">${value}</td>
+    </tr>
+  `;
+}
+
+function emailSection(title) {
+  return `
+    <tr>
+      <td colspan="2" style="padding: 18px 0 8px; font-size: 13px; font-weight: bold; letter-spacing: 0.08em; text-transform: uppercase; color: #b98c2f;">
+        ${title}
+      </td>
+    </tr>
+  `;
+}
+
 function buildMailOptions(data) {
   const concerns = data.primaryConcerns.map((c) => escapeHtml(c)).join(", ");
+  const propertyTypes = (data.propertyTypes || []).map((t) => escapeHtml(t)).join(", ");
+  const contactLabel =
+    data.consultationMethod === "WhatsApp Call"
+      ? "WhatsApp Number"
+      : "Phone Number for Callback";
+  const submittedAt = new Date().toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Kolkata"
+  });
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto; padding: 24px; background: #f9f9f9; border-radius: 12px;">
+      <h2 style="color: #b98c2f; margin: 0 0 6px;">New Free Vastu Callback Request</h2>
+      <p style="color: #666; margin: 0 0 18px;">Submitted on ${escapeHtml(submittedAt)}</p>
+      ${buildCallbackQuickActions(data)}
+      <table style="width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 10px; overflow: hidden; border: 1px solid #e8e8e8;">
+        ${emailSection("Client Details")}
+        ${emailRow("Full Name", escapeHtml(data.fullName), true)}
+        ${emailRow("Mobile", escapeHtml(data.mobile))}
+        ${emailRow("Email", escapeHtml(data.email || "Not provided"), true)}
+        ${emailSection("Property & Concerns")}
+        ${emailRow("Property Type(s)", propertyTypes, true)}
+        ${emailRow("Primary Concern(s)", concerns)}
+        ${emailRow("Concern Detail", `<span style="white-space: pre-wrap;">${escapeHtml(data.concernDetail)}</span>`, true)}
+        ${emailRow("Property Location", escapeHtml(data.propertyLocation))}
+        ${emailRow("Floor Plan Available", data.hasFloorPlan ? "Yes" : "No", true)}
+        ${emailSection("Callback Preference")}
+        ${emailRow("Preferred Time", escapeHtml(data.preferredTimeSlot), true)}
+        ${emailRow("Consultation Method", escapeHtml(data.consultationMethod))}
+        ${emailRow(contactLabel, `<strong style="font-size: 16px;">${escapeHtml(data.consultationContactNumber || "Not provided")}</strong>`, true)}
+        ${emailRow("How They Heard About Us", escapeHtml(data.referralSource || "Not specified"))}
+      </table>
+      <p style="color: #888; font-size: 12px; margin: 16px 0 0; text-align: center;">
+        Reply to this email or use the button above to contact the client quickly.
+      </p>
+    </div>
+  `;
+
+  const textLines = [
+    "NEW FREE VASTU CALLBACK REQUEST",
+    `Submitted: ${submittedAt}`,
+    "",
+    "CLIENT DETAILS",
+    `Full Name: ${data.fullName}`,
+    `Mobile: ${data.mobile}`,
+    `Email: ${data.email || "Not provided"}`,
+    "",
+    "PROPERTY & CONCERNS",
+    `Property Type(s): ${(data.propertyTypes || []).join(", ")}`,
+    `Primary Concern(s): ${data.primaryConcerns.join(", ")}`,
+    `Concern Detail: ${data.concernDetail}`,
+    `Property Location: ${data.propertyLocation}`,
+    `Floor Plan: ${data.hasFloorPlan ? "Yes" : "No"}`,
+    "",
+    "CALLBACK PREFERENCE",
+    `Preferred Time: ${data.preferredTimeSlot}`,
+    `Consultation Method: ${data.consultationMethod}`,
+    `${contactLabel}: ${data.consultationContactNumber || "Not provided"}`,
+    `How They Heard About Us: ${data.referralSource || "Not specified"}`
+  ];
 
   return {
     from: `"Vastu Website" <${env.gmailUser}>`,
     to: env.toEmail,
     replyTo: data.email ? data.email : env.gmailUser,
-    subject: `New Vastu Callback — ${data.fullName}`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px; background: #f9f9f9; border-radius: 10px;">
-        <h2 style="color: #b98c2f; margin-bottom: 8px;">New Free Vastu Callback Request</h2>
-        <p style="color: #555; margin-top: 0;">A new consultation request was submitted on your website.</p>
-        <hr style="border: none; border-top: 1px solid #ddd; margin: 16px 0;" />
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr><td style="padding: 8px 0; font-weight: bold; width: 200px;">Full Name</td><td>${escapeHtml(data.fullName)}</td></tr>
-          <tr style="background: #f0f0f0;"><td style="padding: 8px; font-weight: bold;">Mobile</td><td style="padding: 8px;">${escapeHtml(data.mobile)}</td></tr>
-          <tr><td style="padding: 8px 0; font-weight: bold;">Email</td><td>${escapeHtml(data.email || "Not provided")}</td></tr>
-          <tr style="background: #f0f0f0;"><td style="padding: 8px; font-weight: bold;">Property Type</td><td style="padding: 8px;">${escapeHtml(data.propertyType)}</td></tr>
-          <tr><td style="padding: 8px 0; font-weight: bold;">Primary Concerns</td><td>${concerns}</td></tr>
-          <tr style="background: #f0f0f0;"><td style="padding: 8px; font-weight: bold; vertical-align: top;">Concern Detail</td><td style="padding: 8px; white-space: pre-wrap;">${escapeHtml(data.concernDetail)}</td></tr>
-          <tr><td style="padding: 8px 0; font-weight: bold;">Property Location</td><td>${escapeHtml(data.propertyLocation)}</td></tr>
-          <tr style="background: #f0f0f0;"><td style="padding: 8px; font-weight: bold;">Floor Plan</td><td style="padding: 8px;">${data.hasFloorPlan ? "Yes" : "No"}</td></tr>
-          <tr><td style="padding: 8px 0; font-weight: bold;">Preferred Time</td><td>${escapeHtml(data.preferredTimeSlot)}</td></tr>
-          <tr style="background: #f0f0f0;"><td style="padding: 8px; font-weight: bold;">Consultation Method</td><td style="padding: 8px;">${escapeHtml(data.consultationMethod)}</td></tr>
-          <tr><td style="padding: 8px 0; font-weight: bold;">How They Heard About Us</td><td>${escapeHtml(data.referralSource || "Not specified")}</td></tr>
-        </table>
-      </div>
-    `
+    subject: `New Vastu Callback — ${data.fullName} (${data.consultationMethod})`,
+    html,
+    text: textLines.join("\n")
   };
 }
 

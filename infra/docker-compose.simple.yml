@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-vastu}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in apps/backend/.env}
+      POSTGRES_DB: ${DB_NAME:-vastu_db}
+    volumes:
+      - vastu_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-vastu} -d ${DB_NAME:-vastu_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: ..
+      dockerfile: infra/docker/production.Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../apps/backend/.env
+    environment:
+      NODE_ENV: production
+      SERVE_FRONTEND: "true"
+      DB_HOST: postgres
+      PORT: 5000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "80:5000"
+
+volumes:
+  vastu_pg_data:

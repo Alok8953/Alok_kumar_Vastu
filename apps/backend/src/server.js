@@ -19,13 +19,27 @@ async function startServer() {
 
   const app = createApp();
 
-  app.listen(env.port, () => {
+  const server = app.listen(env.port, "0.0.0.0", () => {
     logStartup(env.port);
+    if (env.serveFrontend) {
+      console.log(`Serving website + API on port ${env.port} (production mode)`);
+    }
     if (!isEmailConfigured()) {
       console.warn(
         "Callback email is NOT configured. Form submissions will still be saved to PostgreSQL."
       );
     }
+  });
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(
+        `Port ${env.port} is already in use. From Vastu_proj run: npm run dev (it frees ports automatically).`
+      );
+      process.exit(1);
+    }
+    console.error("Server error:", err.message);
+    process.exit(1);
   });
 }
 
