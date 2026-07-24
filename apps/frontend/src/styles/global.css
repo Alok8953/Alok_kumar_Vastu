@@ -22,18 +22,19 @@
 *,
 *::before,
 *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: clip; }
 body {
   margin: 0;
   font-family: "Poppins", sans-serif;
   color: var(--text);
   background: var(--bg);
   line-height: 1.6;
+  overflow-x: clip;
 }
-img { max-width: 100%; display: block; }
+img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; text-decoration: none; }
-.container { width: min(var(--container), 92%); margin: 0 auto; }
-.section { padding: 3.3rem 0; position: relative; }
+.container { width: min(var(--container), calc(100% - 2rem)); margin: 0 auto; }
+.section { padding: clamp(2.25rem, 5vw, 3.3rem) 0; position: relative; }
 .panel { border-top: 1px solid var(--border); }
 .section.panel:not(.hero):not(.cta-band) { background: var(--bg); }
 .section.panel:not(.hero):not(.cta-band):nth-of-type(even) { background: var(--bg-alt); }
@@ -200,15 +201,18 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
 }
 .brand-name {
   display: block;
-  font-size: 1.08rem;
+  font-size: clamp(0.88rem, 2.4vw, 1.08rem);
   font-weight: 700;
   color: var(--text);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: min(14rem, calc(100vw - 7.5rem));
   transition: color 0.28s ease;
 }
 .brand-role {
   display: block;
-  font-size: 0.74rem;
+  font-size: clamp(0.62rem, 1.8vw, 0.74rem);
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -348,11 +352,11 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   background: rgba(255, 255, 255, 0.12);
 }
 
-/* Hero — image left (no crop), copy in right panel */
+/* Hero — image left, copy in right panel; face kept in frame on all breakpoints */
 .hero.section.panel {
   position: relative;
   isolation: isolate;
-  padding: 0;
+  padding: var(--header-height) 0 0;
   border-top: none;
   margin-top: calc(-1 * var(--header-height));
   background-color: #1a1208;
@@ -361,10 +365,10 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
 .hero-frame {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.95fr);
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.95fr);
   align-items: stretch;
   width: 100%;
-  padding-bottom: clamp(2.25rem, 5.5vw, 3.25rem);
+  padding-bottom: clamp(2rem, 4vw, 3.25rem);
   background-color: #1a1208;
 }
 .hero-frame::after {
@@ -389,22 +393,25 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   position: relative;
   background-color: #1a1208;
   line-height: 0;
-  min-height: 0;
+  min-height: min(72vh, 680px);
+  max-height: min(88vh, 900px);
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
 }
 .hero-banner-img {
   display: block;
   width: 100%;
   height: 100%;
   min-height: 280px;
-  max-height: min(92vh, 920px);
-  object-fit: contain;
-  object-position: left center;
+  object-fit: cover;
+  object-position: 24% 32%;
 }
 .hero-content-layer {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(1.5rem, 3vw, 2.75rem) clamp(1rem, 2.5vw, 2rem);
+  padding: clamp(1.25rem, 2.5vw, 2.75rem) clamp(1rem, 2vw, 2rem);
   background: linear-gradient(180deg, #1f1610 0%, #1a1208 100%);
   line-height: 1.6;
   overflow: visible;
@@ -2140,35 +2147,102 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   .btn-topbar { display: none; }
 }
 @media (max-width: 1100px) and (min-width: 981px) {
+  .hero-frame {
+    grid-template-columns: 1fr 1fr;
+  }
+  .hero-media {
+    min-height: min(64vh, 560px);
+  }
+  .hero-banner-img {
+    object-position: 26% 30%;
+  }
+  .hero-content {
+    max-width: none;
+  }
   .hero .credentials-list,
   .hero .micro-grid {
     grid-template-columns: 1fr;
   }
 }
 @media (max-width: 980px) {
+  :root {
+    --header-height: 76px;
+  }
+
   .hero-grid,.three-grid,.stats-grid,.footer-grid,.services-grid,.why-grid,.three-col,.five-col,.position-grid,.micro-grid,.credentials-list,.testimonials-grid { grid-template-columns: 1fr; }
   .drawer-stats.stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .hero.section.panel {
+    margin-top: 0;
+    padding-top: 0;
+  }
   .hero-frame {
     display: flex;
     flex-direction: column;
+    padding-bottom: 0;
   }
-  .hero-banner-img {
-    height: auto;
+  .hero-media {
+    width: 100%;
     min-height: 0;
     max-height: none;
-    object-position: center top;
+    aspect-ratio: 16 / 11;
+    max-height: min(48vh, 380px);
+  }
+  .hero-banner-img {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+    object-position: 28% 22%;
   }
   .hero-content-layer {
     display: block;
-    padding: 2.5rem 4% 3rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 4vw, 1.5rem) clamp(2rem, 5vw, 3rem);
     background: #1a1208;
   }
   .hero-content {
     max-width: 100%;
   }
-  .cta-band-wrap { flex-direction: column; align-items: flex-start; }
+  .hero .hero-content h1 {
+    font-size: clamp(1.15rem, 4.8vw, 1.65rem);
+  }
+  .hero .lead {
+    font-size: clamp(0.92rem, 3.6vw, 1.02rem);
+  }
+  .hero .cta-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero .cta-row .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .side-drawer {
+    width: 100%;
+    max-width: none;
+  }
+  .side-drawer-header {
+    padding: 1.25rem 3.25rem 1rem 1.15rem;
+  }
+  .side-drawer-body {
+    padding: 1rem 1.15rem 1.75rem;
+  }
+
+  .cta-band.section.panel {
+    background-position: 28% center;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .cta-band-wrap { flex-direction: column; align-items: stretch; }
+  .cta-band-wrap .whatsapp-cta {
+    align-self: flex-start;
+  }
   .menu-toggle { display: inline-block; }
   .site-header {
     position: sticky;
@@ -2206,6 +2280,72 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   }
   .site-nav.open { display: flex; }
   .nav-cta { margin: 0.45rem 0 0; max-width: none; font-size: 0.85rem; }
+}
+
+@media (min-width: 768px) and (max-width: 980px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .footer-grid > :first-child {
+    grid-column: 1 / -1;
+  }
+  .hero-media {
+    aspect-ratio: 16 / 10;
+    max-height: min(52vh, 440px);
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --header-height: 68px;
+  }
+
+  .container {
+    width: min(var(--container), calc(100% - 1.25rem));
+  }
+
+  .brand img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .hero-media {
+    aspect-ratio: 4 / 3;
+    max-height: min(44vh, 320px);
+  }
+  .hero-banner-img {
+    object-position: 32% 18%;
+  }
+  .hero .micro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .parallax-section.is-inview:not(.is-revealed) {
+    min-height: min(58vh, 420px);
+  }
+  .parallax-section.is-inview:not(.is-revealed) .parallax-section-inner {
+    min-height: min(52vh, 380px);
+  }
+  .parallax-section-header h2 {
+    font-size: clamp(1.35rem, 6vw, 1.85rem);
+  }
+
+  .modal-overlay {
+    padding: 0.75rem;
+    align-items: flex-end;
+  }
+  .modal-card,
+  .modal-card-wide {
+    max-height: 92vh;
+    overflow-y: auto;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .whatsapp-float {
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    right: max(0.75rem, env(safe-area-inset-right));
+  }
 }
 
 /* Admin — review approvals (#admin/reviews) */
