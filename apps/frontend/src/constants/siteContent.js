@@ -129,42 +129,96 @@ export const SPECIALIZED_SERVICES = [
     title: "Basic Vastu",
     tagline: "Home & office space correction",
     body: "Space correction for stability.",
-    image: "/assets/services/basic-vastu.svg"
+    image: "/assets/services/basic-vastu.svg",
+    headline: "Solutions of every problem",
+    points: [
+      "Vastu for health",
+      "Vastu for wealth",
+      "Vastu for job",
+      "Vastu for payment recovery",
+      "Vastu for relationships",
+      "And many more"
+    ]
   },
   {
     id: "spec-numero",
     title: "Numero Vastu",
     tagline: "Numbers aligned with your space",
     body: "Number alignment with environment.",
-    image: "/assets/services/numero-vastu.svg"
+    image: "/assets/services/numero-vastu.svg",
+    headline: "Numbers that support your space",
+    points: [
+      "Name & number vibration check",
+      "Mobile & vehicle number alignment",
+      "House / flat number correction",
+      "Business name with Vastu sync",
+      "Lucky dates for key decisions",
+      "And many more"
+    ]
   },
   {
     id: "spec-astro",
     title: "Astro Vastu",
     tagline: "Planets + directions in sync",
     body: "Planetary and spatial alignment.",
-    image: "/assets/services/astro-vastu.svg"
+    image: "/assets/services/astro-vastu.svg",
+    headline: "Planets and directions together",
+    points: [
+      "Birth chart + space alignment",
+      "Planetary effect on each direction",
+      "Right timing for corrections",
+      "Graha-based practical remedies",
+      "Career & finance through Astro-Vastu",
+      "And many more"
+    ]
   },
   {
     id: "spec-devta",
     title: "Devta Energy Activation",
     tagline: "Directional energies strengthened",
     body: "Strengthening directional energies.",
-    image: "/assets/services/devta-energy.svg"
+    image: "/assets/services/devta-energy.svg",
+    headline: "Activate directional energies",
+    points: [
+      "Directional Devta mapping",
+      "Energy activation for weak zones",
+      "Balance of five elements",
+      "Strengthen NE, SW & key corners",
+      "Maintain positive energy flow",
+      "And many more"
+    ]
   },
   {
     id: "spec-remedies",
     title: "Advanced Remedies",
     tagline: "Root-cause based corrections",
     body: "Root-cause-based corrections.",
-    image: "/assets/services/advanced-remedies.svg"
+    image: "/assets/services/advanced-remedies.svg",
+    headline: "Fix the root — not just symptoms",
+    points: [
+      "Root-cause diagnosis of issues",
+      "Non-demolition practical corrections",
+      "Custom remedy plan for your space",
+      "Priority: what to do first",
+      "Follow-up for lasting results",
+      "And many more"
+    ]
   },
   {
     id: "spec-industrial",
     title: "Industrial Vastu",
     tagline: "Factory & business alignment",
     body: "Business and factory alignment.",
-    image: "/assets/services/industrial-vastu.svg"
+    image: "/assets/services/industrial-vastu.svg",
+    headline: "Factory & business alignment",
+    points: [
+      "Factory & plant layout correction",
+      "Machine & workflow placement",
+      "Entry, exit & cash-flow zones",
+      "Staff productivity energy balance",
+      "Warehouse & office sync",
+      "And many more"
+    ]
   }
 ];
 
