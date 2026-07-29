@@ -178,14 +178,14 @@ export const SPECIALIZED_SERVICES = [
     tagline: "Directional energies strengthened",
     body: "Strengthening directional energies.",
     image: "/assets/services/devta-energy.svg",
-    headline: "Activate directional energies",
+    headline: "Devta Energy Activation",
     points: [
-      "Directional Devta mapping",
-      "Energy activation for weak zones",
-      "Balance of five elements",
-      "Strengthen NE, SW & key corners",
-      "Maintain positive energy flow",
-      "And many more"
+      "Activation of 44 Devta Energies",
+      "Energy balancing as per Vastu Purusha Mandala",
+      "Improves health, wealth & harmony",
+      "Enhances positive energy flow",
+      "For home, office & commercial spaces",
+      "Brahma Devta (Brahmasthan) energy is not activated, as it should remain unchanged."
     ]
   },
   {
