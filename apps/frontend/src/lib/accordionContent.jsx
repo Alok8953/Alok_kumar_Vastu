@@ -71,7 +71,9 @@ function testimonialToAccordionItem(item) {
 }
 
 export function buildTestimonialAccordionItems(publishedReviews = []) {
+  const MAX_ITEMS = 5;
   const clientItems = publishedReviews.map(testimonialToAccordionItem);
-  const staticItems = TESTIMONIALS.map(testimonialToAccordionItem);
-  return [...clientItems, ...staticItems];
+  const needed = Math.max(0, MAX_ITEMS - clientItems.length);
+  const staticItems = TESTIMONIALS.slice(0, needed).map(testimonialToAccordionItem);
+  return [...clientItems.slice(0, MAX_ITEMS), ...staticItems];
 }

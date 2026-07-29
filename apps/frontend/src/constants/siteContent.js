@@ -255,71 +255,36 @@ export const TESTIMONIALS = [
   {
     id: "t-rahul",
     quote:
-      "Within 3 months of implementing suggested corrections, my business cash flow improved significantly.",
+      "We shifted the main entrance and cleared the NE corner as suggested. Within a few months cash flow felt less stuck — not overnight magic, but clearly better.",
     name: "Rahul Sharma",
     city: "Lucknow"
   },
   {
     id: "t-priya",
     quote:
-      "The bedroom and kitchen alignment changes brought noticeable peace at home. Family conflicts reduced within weeks.",
+      "Bedroom and kitchen changes were simple. Home feels calmer now and arguments have come down. Didn’t expect that much from layout alone.",
     name: "Priya Mehta",
-    city: "Mumbai"
-  },
-  {
-    id: "t-amit",
-    quote:
-      "I was stuck in my career for years. After the consultation, direction became clear and I got a promotion in 4 months.",
-    name: "Amit Verma",
-    city: "Delhi"
+    city: "Noida"
   },
   {
     id: "t-suresh",
     quote:
-      "Our shop layout was completely misaligned. Sales picked up after we applied the recommended Vastu corrections.",
+      "Shop seating and cash counter were wrong. After fixing the direction, walk-ins improved. Report was clear — we didn’t need to redo the whole shop.",
     name: "Suresh Agarwal",
-    city: "Jaipur"
-  },
-  {
-    id: "t-neha",
-    quote:
-      "The Astro-Vastu analysis explained why repeated financial losses were happening. Remedies were practical and effective.",
-    name: "Neha Kapoor",
-    city: "Pune"
-  },
-  {
-    id: "t-vikram",
-    quote:
-      "Marriage-related stress was affecting our health. Space corrections and guidance helped restore harmony at home.",
-    name: "Vikram Singh",
-    city: "Patna"
-  },
-  {
-    id: "t-manoj",
-    quote:
-      "Industrial unit Vastu review improved workflow and reduced unexpected breakdowns on the factory floor.",
-    name: "Manoj Tiwari",
-    city: "Kanpur"
+    city: "Gurgaon"
   },
   {
     id: "t-anjali",
     quote:
-      "Online consultation was detailed and easy to follow. The personalized report made every step very clear.",
+      "Online session was practical. Got a short list of what to change first and what can wait. Easy to follow even without being Vastu experts.",
     name: "Anjali Desai",
     city: "Ahmedabad"
   },
   {
     id: "t-kavita",
     quote:
-      "My new apartment felt heavy and unsettling. After corrections, sleep quality and mental clarity improved a lot.",
+      "New flat felt restless — poor sleep. After the corrections, sleep is better and the place feels lighter. Still following the remaining steps.",
     name: "Kavita Nair",
     city: "Bangalore"
-  },
-  {
-    id: "t-rohit",
-    quote:
-      "Child-related concerns were addressed with both Vastu and lifestyle guidance. We finally feel stable and positive.",
-    name: "Rohit Malhotra",
-    city: "Chandigarh"
   }
 ];
