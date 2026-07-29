@@ -73,7 +73,12 @@ export function HomePage({ onOpenModal, onOpenServices }) {
         <SpecializedServiceCards />
       </ParallaxRevealSection>
 
-      <ParallaxRevealSection id="why" kicker="Why This Works" title="Five key differentiators">
+      <ParallaxRevealSection
+        id="why"
+        className="parallax-section--compact"
+        kicker="Why This Works"
+        title="Five key differentiators"
+      >
         <WhyDifferentiatorCards />
       </ParallaxRevealSection>
 
