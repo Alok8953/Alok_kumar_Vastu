@@ -1826,7 +1826,10 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
 .testimonials-cta-row { margin-top: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.85rem 1.2rem; }
 .testimonials-cta-note { margin: 0; color: var(--text-soft); font-size: 0.9rem; max-width: 42ch; }
 .clients-feedback-section {
-  padding: clamp(1.35rem, 3vw, 2rem) 0;
+  padding: clamp(1.2rem, 2.5vw, 1.75rem) 0;
+}
+.clients-feedback-section .section-kicker {
+  margin: 0 0 0.25rem;
 }
 .clients-feedback-toggle {
   display: flex;
@@ -1835,13 +1838,14 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   gap: 1rem;
   width: 100%;
   margin: 0;
-  padding: 0.15rem 0;
+  padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
   color: inherit;
+  min-height: 0;
 }
 .clients-feedback-toggle:focus-visible {
   outline: 2px solid var(--gold);
@@ -1849,16 +1853,16 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   border-radius: 6px;
 }
 .clients-feedback-heading {
-  margin: 0;
+  margin: 0 !important;
   font-family: "Playfair Display", serif;
   font-size: clamp(1.45rem, 3.2vw, 2rem);
-  line-height: 1.15;
+  line-height: 1.1;
   color: var(--heading);
 }
 .clients-feedback-chevron {
   flex-shrink: 0;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2.4rem;
+  height: 2.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1870,30 +1874,34 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   transition: transform 0.28s ease, background 0.2s ease;
 }
 .clients-feedback-chevron svg {
-  width: 1.3rem;
-  height: 1.3rem;
+  width: 1.2rem;
+  height: 1.2rem;
 }
 .clients-feedback-toggle.is-open .clients-feedback-chevron {
   transform: rotate(180deg);
   background: rgba(200, 155, 60, 0.18);
 }
 .clients-feedback-panel {
-  margin-top: 0.45rem;
+  margin-top: 0;
+  padding-top: 0;
   animation: clientsFeedbackIn 0.25s ease;
 }
 @keyframes clientsFeedbackIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .clients-feedback-intro {
-  margin: 0 0 0.75rem;
+  margin: 0.2rem 0 0.55rem !important;
   color: var(--text-soft);
-  font-size: 0.95rem;
-  line-height: 1.4;
+  font-size: 0.92rem;
+  line-height: 1.35;
   max-width: 65ch;
 }
 .clients-feedback-panel .testimonials-cta-row {
-  margin-top: 0.55rem;
+  margin-top: 0.45rem;
+}
+.clients-feedback-panel .accordion {
+  margin-top: 0.75rem;
 }
 .form-label {
   display: block;
