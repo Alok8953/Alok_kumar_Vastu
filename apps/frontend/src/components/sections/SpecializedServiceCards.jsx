@@ -2,19 +2,18 @@ import { SPECIALIZED_SERVICES } from "../../constants/siteContent.js";
 
 export function SpecializedServiceCards() {
   return (
-    <div className="service-showcase-grid">
-      {SPECIALIZED_SERVICES.map((service, index) => (
+    <div className="service-showcase-grid service-showcase-grid--compact">
+      {SPECIALIZED_SERVICES.map((service) => (
         <article key={service.id} className="service-showcase-card">
           <div className="service-showcase-media">
-            <img src={service.image} alt="" width={400} height={240} loading="lazy" decoding="async" />
+            <img src={service.image} alt="" width={400} height={160} loading="lazy" decoding="async" />
             <div className="service-showcase-media-overlay" aria-hidden="true" />
-            <span className="service-showcase-step">{String(index + 1).padStart(2, "0")}</span>
             <img
               className="service-showcase-logo"
               src="/assets/vastu-compass-logo.svg"
               alt=""
-              width={28}
-              height={28}
+              width={22}
+              height={22}
               aria-hidden="true"
             />
           </div>

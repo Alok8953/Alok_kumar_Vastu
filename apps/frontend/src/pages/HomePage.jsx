@@ -66,6 +66,7 @@ export function HomePage({ onOpenModal, onOpenServices }) {
 
       <ParallaxRevealSection
         id="specialized"
+        className="parallax-section--compact"
         kicker="Specialized Services"
         title="Specialized Vastu & Energy Services"
       >

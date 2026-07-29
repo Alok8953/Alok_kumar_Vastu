@@ -794,6 +794,58 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   line-height: 1.45;
   color: var(--text-soft);
 }
+.service-showcase-grid--compact {
+  gap: 0.65rem;
+  padding: 0;
+}
+@media (min-width: 1024px) {
+  .service-showcase-grid--compact {
+    gap: 0.75rem;
+  }
+}
+.service-showcase-grid--compact .service-showcase-card {
+  border-radius: calc(var(--radius) - 2px);
+  transition:
+    transform 0.28s cubic-bezier(0.34, 1.35, 0.64, 1),
+    box-shadow 0.28s ease,
+    border-color 0.2s ease,
+    opacity 0.24s ease;
+}
+.service-showcase-grid--compact:has(.service-showcase-card:hover) .service-showcase-card:not(:hover) {
+  opacity: 0.9;
+  transform: scale(0.99);
+}
+.service-showcase-grid--compact .service-showcase-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 12px 24px rgba(74, 46, 30, 0.12),
+    0 0 0 1px rgba(200, 155, 60, 0.3);
+}
+.service-showcase-grid--compact .service-showcase-media {
+  aspect-ratio: 16 / 7;
+}
+.service-showcase-grid--compact .service-showcase-card:hover .service-showcase-media img:first-of-type {
+  transform: scale(1.04);
+}
+.service-showcase-grid--compact .service-showcase-logo {
+  top: 0.45rem;
+  right: 0.45rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 6px;
+}
+.service-showcase-grid--compact .service-showcase-body {
+  gap: 0.2rem;
+  padding: 0.55rem 0.75rem 0.65rem;
+}
+.service-showcase-grid--compact .service-showcase-title {
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  line-height: 1.2;
+}
+.service-showcase-grid--compact .service-showcase-tagline {
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
 .compact { margin-top: 1.2rem; }
 .compact h3 { color: var(--gold); }
 .cta-band.section.panel {
