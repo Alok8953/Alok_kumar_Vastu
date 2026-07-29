@@ -52,6 +52,7 @@ export function HomePage({ onOpenModal, onOpenServices }) {
 
       <ParallaxRevealSection
         id="framework"
+        className="parallax-section--compact"
         kicker="Core Framework"
         title="Three layers. One clear system."
         footer={
