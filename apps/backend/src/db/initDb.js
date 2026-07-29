@@ -272,6 +272,11 @@ async function ensureReviewPhoneAuth(pool) {
   `);
 
   await pool.query(`
+    ALTER TABLE client_reviews
+    ADD COLUMN IF NOT EXISTS email VARCHAR(255)
+  `);
+
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS review_otp_challenges (
       id SERIAL PRIMARY KEY,
       phone VARCHAR(15) NOT NULL,

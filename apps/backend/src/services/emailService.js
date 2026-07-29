@@ -172,9 +172,10 @@ function buildReviewMailContent(data) {
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 8px 0; font-weight: bold; width: 160px;">Name</td><td>${escapeHtml(data.fullName)}</td></tr>
           <tr style="background: #f0f0f0;"><td style="padding: 8px; font-weight: bold;">Phone</td><td style="padding: 8px;">${escapeHtml(data.phone || "Not provided")}</td></tr>
-          <tr><td style="padding: 8px 0; font-weight: bold;">City</td><td>${escapeHtml(data.city || "Not provided")}</td></tr>
-          <tr style="background: #f0f0f0;"><td style="padding: 8px; font-weight: bold;">Rating</td><td style="padding: 8px;">${starsLabel(data.rating)} (${data.rating}/5)</td></tr>
-          <tr><td style="padding: 8px 0; font-weight: bold; vertical-align: top;">Experience</td><td style="white-space: pre-wrap;">${escapeHtml(data.reviewText)}</td></tr>
+          <tr><td style="padding: 8px 0; font-weight: bold;">Email</td><td>${escapeHtml(data.email || "Not provided")}</td></tr>
+          <tr style="background: #f0f0f0;"><td style="padding: 8px; font-weight: bold;">City</td><td style="padding: 8px;">${escapeHtml(data.city || "Not provided")}</td></tr>
+          <tr><td style="padding: 8px 0; font-weight: bold;">Rating</td><td>${starsLabel(data.rating)} (${data.rating}/5)</td></tr>
+          <tr style="background: #f0f0f0;"><td style="padding: 8px; font-weight: bold; vertical-align: top;">Experience</td><td style="padding: 8px; white-space: pre-wrap;">${escapeHtml(data.reviewText)}</td></tr>
         </table>
         <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 24px 0 8px;">
           <tr>

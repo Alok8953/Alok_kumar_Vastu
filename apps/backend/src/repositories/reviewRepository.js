@@ -5,13 +5,13 @@ function newApproveToken() {
   return crypto.randomBytes(24).toString("hex");
 }
 
-export async function createClientReview({ fullName, city, rating, reviewText, phone }) {
+export async function createClientReview({ fullName, city, rating, reviewText, phone, email }) {
   const approveToken = newApproveToken();
   const { rows } = await getPool().query(
-    `INSERT INTO client_reviews (full_name, city, rating, review_text, approve_token, phone)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO client_reviews (full_name, city, rating, review_text, approve_token, phone, email)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING id, status, approve_token, created_at`,
-    [fullName, city, rating, reviewText, approveToken, phone || null]
+    [fullName, city, rating, reviewText, approveToken, phone || null, email || null]
   );
 
   return rows[0];

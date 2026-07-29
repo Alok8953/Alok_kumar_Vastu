@@ -13,7 +13,7 @@ export function TestimonialsContent({ onOpenReview }) {
           Share Your Experience
         </button>
         <p className="testimonials-cta-note">
-          Had a consultation? Verify with OTP to submit your review
+          Had a consultation? Share your feedback with mobile &amp; email
         </p>
       </div>
       <Accordion className="accordion--testimonials" items={accordionItems} />
