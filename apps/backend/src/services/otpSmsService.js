@@ -34,5 +34,11 @@ export async function sendOtpSms(phone, otp) {
 }
 
 export function shouldExposeDebugOtp() {
-  return env.nodeEnv !== "production" || env.otpDebug;
+  // Local/dev always; production only when OTP_DEBUG=true
+  return env.nodeEnv !== "production" || env.otpDebug === true;
+}
+
+/** When SMS key missing, still allow OTP flow if debug is on. */
+export function canIssueOtpWithoutSms() {
+  return shouldExposeDebugOtp();
 }

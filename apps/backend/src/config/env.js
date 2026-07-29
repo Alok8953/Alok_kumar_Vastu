@@ -32,9 +32,9 @@ export const env = {
     process.env.RESEND_FROM || "Vastu Website <onboarding@resend.dev>",
   gmailUser: process.env.GMAIL_USER || "alokkmishra06@gmail.com",
   gmailAppPassword: process.env.GMAIL_APP_PASSWORD || "",
-  toEmail: process.env.TO_EMAIL || "alokkmishra06@gmail.com",
-  fast2smsApiKey: process.env.FAST2SMS_API_KEY || "",
-  otpDebug: process.env.OTP_DEBUG === "true",
+  toEmail: (process.env.TO_EMAIL || "alokkmishra06@gmail.com").trim(),
+  fast2smsApiKey: (process.env.FAST2SMS_API_KEY || "").trim(),
+  otpDebug: (process.env.OTP_DEBUG || "").trim().toLowerCase() === "true",
   databaseUrl: databaseUrl || null,
   db: fromUrl || {
     host: process.env.DB_HOST || "localhost",

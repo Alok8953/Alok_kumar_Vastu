@@ -46,9 +46,10 @@ export async function sendReviewOtpController(req, res) {
   return res.status(200).json({
     message: sms.sent
       ? `OTP sent to ${maskPhone(phone)}.`
-      : `OTP generated for ${maskPhone(phone)}. Use the code shown below (SMS not configured — debug mode).`,
+      : `OTP generated for ${maskPhone(phone)}. Use the code shown below.`,
     phoneMasked: maskPhone(phone),
-    ...(expose ? { debugOtp: otp } : {})
+    // Always return OTP on screen when SMS did not send (debug / no gateway)
+    ...(!sms.sent || expose ? { debugOtp: otp } : {})
   });
 }
 
