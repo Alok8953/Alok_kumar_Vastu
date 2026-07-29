@@ -95,7 +95,7 @@ export function AdminReviewsPage({ onExit }) {
             <p className="admin-kicker">Vastu Website</p>
             <h1>Review Approvals</h1>
             <p className="admin-intro">
-              Approve a review to show it in Client Success Stories on the homepage.
+              Approve a review to show it in Clients Feedback on the homepage.
             </p>
           </div>
           <button type="button" className="btn btn-outline" onClick={onExit}>

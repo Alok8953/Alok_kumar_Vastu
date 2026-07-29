@@ -30,7 +30,7 @@ export function SiteFooter({ onOpenAbout, onOpenServices }) {  return (
               <a href="#process">How It Works</a>
             </li>
             <li>
-              <a href="#testimonials">Success Stories</a>
+              <a href="#testimonials">Clients Feedback</a>
             </li>
             <li>
               <a href="#positioning">Our Approach</a>

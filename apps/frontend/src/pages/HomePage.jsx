@@ -87,7 +87,7 @@ export function HomePage({ onOpenModal, onOpenServices, onOpenReview }) {
         id="testimonials"
         className="parallax-section--compact"
         kicker="Real Results"
-        title="Client Success Stories"
+        title="Clients Feedback"
         intro="Homes & offices transformed after alignment."
       >
         <TestimonialsContent onOpenReview={onOpenReview} />
