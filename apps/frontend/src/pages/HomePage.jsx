@@ -6,8 +6,9 @@ import { CredentialsBanner } from "../components/sections/CredentialsBanner";
 import { FrameworkLayerCards } from "../components/sections/FrameworkLayerCards.jsx";
 import { SpecializedServiceCards } from "../components/sections/SpecializedServiceCards.jsx";
 import { WhyDifferentiatorCards } from "../components/sections/WhyDifferentiatorCards.jsx";
+import { TestimonialsContent } from "../components/sections/TestimonialsSection.jsx";
 
-export function HomePage({ onOpenModal, onOpenServices }) {
+export function HomePage({ onOpenModal, onOpenServices, onOpenReview }) {
   return (
     <main id="main-content">
       <section className="hero section panel" id="home">
@@ -80,6 +81,16 @@ export function HomePage({ onOpenModal, onOpenServices }) {
         title="Five key differentiators"
       >
         <WhyDifferentiatorCards />
+      </ParallaxRevealSection>
+
+      <ParallaxRevealSection
+        id="testimonials"
+        className="parallax-section--compact"
+        kicker="Real Results"
+        title="Client Success Stories"
+        intro="Homes & offices transformed after alignment."
+      >
+        <TestimonialsContent onOpenReview={onOpenReview} />
       </ParallaxRevealSection>
 
       <section className="cta-band section panel" id="contact">

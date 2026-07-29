@@ -1,6 +1,5 @@
 import { useEffect, useId, useState } from "react";
 import { ConsultationProcessContent } from "../sections/ConsultationProcessSection.jsx";
-import { TestimonialsContent } from "../sections/TestimonialsSection.jsx";
 import { PositioningContent } from "../sections/PositioningSection.jsx";
 
 const PRIMARY_SECTIONS = [
@@ -17,15 +16,6 @@ const PRIMARY_SECTIONS = [
     teaser: "Structured Vastu system — not prediction"
   }
 ];
-
-const TESTIMONIALS_SECTION = {
-  id: "testimonials",
-  kicker: "Real Results",
-  title: "Client Success Stories",
-  teaser: "Homes & offices transformed after alignment"
-};
-
-const ALL_SECTIONS = [...PRIMARY_SECTIONS, TESTIMONIALS_SECTION];
 
 function ExploreCard({ section, isOpen, panelId, onToggle }) {
   return (
@@ -58,14 +48,14 @@ function ExploreCard({ section, isOpen, panelId, onToggle }) {
 }
 
 /** Catchy expandable cards above the footer — easy to spot, tap to open. */
-export function FooterExpandableBand({ onOpenReview }) {
+export function FooterExpandableBand() {
   const [openId, setOpenId] = useState(null);
   const panelId = useId();
 
   useEffect(() => {
     function syncFromHash() {
       const hash = window.location.hash.replace(/^#/, "");
-      if (ALL_SECTIONS.some((s) => s.id === hash)) {
+      if (PRIMARY_SECTIONS.some((s) => s.id === hash)) {
         setOpenId(hash);
         requestAnimationFrame(() => {
           document.getElementById("footer-explore")?.scrollIntoView({
@@ -85,8 +75,7 @@ export function FooterExpandableBand({ onOpenReview }) {
     setOpenId((prev) => (prev === id ? null : id));
   }
 
-  const active = ALL_SECTIONS.find((s) => s.id === openId);
-  const isTestimonialsOpen = openId === TESTIMONIALS_SECTION.id;
+  const active = PRIMARY_SECTIONS.find((s) => s.id === openId);
 
   return (
     <section className="footer-expandable-band" id="footer-explore">
@@ -95,7 +84,7 @@ export function FooterExpandableBand({ onOpenReview }) {
           <p className="footer-expandable-eyebrow">Explore More</p>
           <h2 className="footer-expandable-heading">Everything you need before booking</h2>
           <p className="footer-expandable-sub">
-            Process, client stories, and our approach — pick a card below. No scrolling hunt.
+            Process and our approach — pick a card below.
           </p>
         </header>
 
@@ -115,15 +104,6 @@ export function FooterExpandableBand({ onOpenReview }) {
           ))}
         </div>
 
-        <div className="footer-expandable-spotlight" role="tablist" aria-label="Client success stories">
-          <ExploreCard
-            section={TESTIMONIALS_SECTION}
-            isOpen={isTestimonialsOpen}
-            panelId={panelId}
-            onToggle={toggleSection}
-          />
-        </div>
-
         {active ? (
           <div
             id={panelId}
@@ -139,9 +119,6 @@ export function FooterExpandableBand({ onOpenReview }) {
               </div>
             </header>
             {active.id === "process" ? <ConsultationProcessContent /> : null}
-            {active.id === "testimonials" ? (
-              <TestimonialsContent onOpenReview={onOpenReview} />
-            ) : null}
             {active.id === "positioning" ? <PositioningContent /> : null}
           </div>
         ) : null}

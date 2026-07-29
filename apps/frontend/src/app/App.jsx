@@ -130,8 +130,12 @@ export function App() {
         activeDrawer={activeDrawer}
         onOpenDrawer={handleOpenDrawer}
       />
-      <HomePage onOpenModal={openModal} onOpenServices={() => handleOpenDrawer("services")} />
-      <FooterExpandableBand onOpenReview={openReview} />
+      <HomePage
+        onOpenModal={openModal}
+        onOpenServices={() => handleOpenDrawer("services")}
+        onOpenReview={openReview}
+      />
+      <FooterExpandableBand />
       <SiteFooter
         onOpenAbout={() => handleOpenDrawer("about")}
         onOpenServices={() => handleOpenDrawer("services")}

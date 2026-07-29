@@ -46,7 +46,7 @@ export function SiteFooter({ onOpenAbout, onOpenServices }) {  return (
             <li>
               <PhoneContactLink />
             </li>
-            <li>Location: Noida, Gurgaon</li>
+            <li>Service Area — Pan India</li>
           </ul>
         </section>
       </div>
