@@ -23,6 +23,13 @@ function validateForm(form) {
 }
 
 export function ReviewModal({ isOpen, onClose }) {
+  const [step, setStep] = useState("phone"); // phone | otp | form | success
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [debugOtp, setDebugOtp] = useState("");
+  const [phoneMasked, setPhoneMasked] = useState("");
+  const [authToken, setAuthToken] = useState("");
+  const [verifiedPhone, setVerifiedPhone] = useState("");
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -36,6 +43,13 @@ export function ReviewModal({ isOpen, onClose }) {
       setTimeout(() => firstInputRef.current?.focus(), 50);
     } else {
       document.body.style.overflow = "";
+      setStep("phone");
+      setPhone("");
+      setOtp("");
+      setDebugOtp("");
+      setPhoneMasked("");
+      setAuthToken("");
+      setVerifiedPhone("");
       setForm(INITIAL_FORM);
       setStatus("idle");
       setErrorMsg("");
@@ -65,6 +79,43 @@ export function ReviewModal({ isOpen, onClose }) {
 
   const activeRating = hoverRating || Number(form.rating) || 0;
 
+  async function handleSendOtp(e) {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMsg("");
+    setDebugOtp("");
+
+    try {
+      const data = await postApi("/api/reviews/otp/send", { phone });
+      setPhoneMasked(data.phoneMasked || "");
+      if (data.debugOtp) setDebugOtp(String(data.debugOtp));
+      setOtp("");
+      setStep("otp");
+      setStatus("idle");
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err.message || "Could not send OTP. Please try again.");
+    }
+  }
+
+  async function handleVerifyOtp(e) {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMsg("");
+
+    try {
+      const data = await postApi("/api/reviews/otp/verify", { phone, otp });
+      setAuthToken(data.authToken || "");
+      setVerifiedPhone(data.phone || phone.replace(/\D/g, "").slice(-10));
+      setStep("form");
+      setStatus("idle");
+      setTimeout(() => firstInputRef.current?.focus(), 50);
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err.message || "Incorrect OTP. Please try again.");
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     const errors = validateForm(form);
@@ -82,9 +133,12 @@ export function ReviewModal({ isOpen, onClose }) {
         fullName: form.fullName.trim(),
         city: form.city.trim() || null,
         rating: Number(form.rating),
-        reviewText: form.reviewText.trim()
+        reviewText: form.reviewText.trim(),
+        phone: verifiedPhone,
+        authToken
       });
 
+      setStep("success");
       setStatus("success");
     } catch (err) {
       setStatus("error");
@@ -112,7 +166,7 @@ export function ReviewModal({ isOpen, onClose }) {
           &#x2715;
         </button>
 
-        {status === "success" ? (
+        {step === "success" ? (
           <div className="modal-success">
             <div className="modal-success-icon">&#10003;</div>
             <h2>Thank you!</h2>
@@ -121,10 +175,101 @@ export function ReviewModal({ isOpen, onClose }) {
               Close
             </button>
           </div>
-        ) : (
+        ) : null}
+
+        {step === "phone" ? (
+          <>
+            <p className="modal-kicker">Verify to continue</p>
+            <h2 id="review-modal-title">Share Your Experience</h2>
+            <p className="modal-lead">
+              Enter your mobile number. We will send an OTP before you can submit feedback.
+            </p>
+            {status === "error" && <p className="form-error">{errorMsg}</p>}
+            <form onSubmit={handleSendOtp} noValidate>
+              <div className="form-group">
+                <label htmlFor="review-phone">
+                  Mobile Number <span className="required-mark">*</span>
+                </label>
+                <input
+                  id="review-phone"
+                  name="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  ref={firstInputRef}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="10-digit Indian mobile"
+                  autoComplete="tel"
+                  required
+                />
+              </div>
+              <button className="btn btn-primary" type="submit" disabled={status === "loading"}>
+                {status === "loading" ? "Sending OTP…" : "Send OTP"}
+              </button>
+            </form>
+          </>
+        ) : null}
+
+        {step === "otp" ? (
+          <>
+            <p className="modal-kicker">OTP verification</p>
+            <h2 id="review-modal-title">Enter OTP</h2>
+            <p className="modal-lead">
+              OTP sent to {phoneMasked || "your number"}. Valid for 10 minutes.
+            </p>
+            {debugOtp ? (
+              <p className="otp-debug-hint">
+                Test OTP: <strong>{debugOtp}</strong>
+              </p>
+            ) : null}
+            {status === "error" && <p className="form-error">{errorMsg}</p>}
+            <form onSubmit={handleVerifyOtp} noValidate>
+              <div className="form-group">
+                <label htmlFor="review-otp">
+                  6-digit OTP <span className="required-mark">*</span>
+                </label>
+                <input
+                  id="review-otp"
+                  name="otp"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  ref={firstInputRef}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  autoComplete="one-time-code"
+                  required
+                />
+              </div>
+              <div className="otp-actions">
+                <button className="btn btn-primary" type="submit" disabled={status === "loading"}>
+                  {status === "loading" ? "Verifying…" : "Verify & Continue"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  disabled={status === "loading"}
+                  onClick={() => {
+                    setStep("phone");
+                    setErrorMsg("");
+                    setDebugOtp("");
+                    setOtp("");
+                  }}
+                >
+                  Change number
+                </button>
+              </div>
+            </form>
+          </>
+        ) : null}
+
+        {step === "form" ? (
           <>
             <p className="modal-kicker">Share Your Story</p>
             <h2 id="review-modal-title">Share Your Experience</h2>
+            <p className="modal-lead otp-verified-note">
+              Verified: {verifiedPhone.slice(0, 2)}******{verifiedPhone.slice(-2)}
+            </p>
             {status === "error" && <p className="form-error">{errorMsg}</p>}
 
             <form onSubmit={handleSubmit} noValidate>
@@ -203,16 +348,12 @@ export function ReviewModal({ isOpen, onClose }) {
                 />
               </div>
 
-              <button
-                className="btn btn-primary"
-                type="submit"
-                disabled={status === "loading"}
-              >
+              <button className="btn btn-primary" type="submit" disabled={status === "loading"}>
                 {status === "loading" ? "Submitting…" : "Submit Review"}
               </button>
             </form>
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );

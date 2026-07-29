@@ -12,7 +12,9 @@ export function TestimonialsContent({ onOpenReview }) {
         <button type="button" className="btn btn-outline" onClick={onOpenReview}>
           Share Your Experience
         </button>
-        <p className="testimonials-cta-note">Had a consultation? Submit your review</p>
+        <p className="testimonials-cta-note">
+          Had a consultation? Verify with OTP to submit your review
+        </p>
       </div>
       <Accordion className="accordion--testimonials" items={accordionItems} />
     </>

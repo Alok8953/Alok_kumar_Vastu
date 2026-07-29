@@ -78,6 +78,25 @@ CREATE INDEX IF NOT EXISTS idx_client_reviews_created_at
 
 CREATE INDEX IF NOT EXISTS idx_client_reviews_status
   ON client_reviews (status);
+
+CREATE TABLE IF NOT EXISTS review_otp_challenges (
+  id SERIAL PRIMARY KEY,
+  phone VARCHAR(15) NOT NULL,
+  otp_hash VARCHAR(128) NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  attempts SMALLINT NOT NULL DEFAULT 0,
+  verified_at TIMESTAMPTZ,
+  auth_token VARCHAR(64) UNIQUE,
+  auth_expires_at TIMESTAMPTZ,
+  auth_used_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_review_otp_phone_created
+  ON review_otp_challenges (phone, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_review_otp_auth_token
+  ON review_otp_challenges (auth_token);
 `;
 
 async function ensureDatabaseExists() {
@@ -183,6 +202,7 @@ export async function initDatabase() {
     await ensurePropertyTypesColumn(pool);
     await ensureConsultationContactNumberColumn(pool);
     await ensureReviewApproveTokens(pool);
+    await ensureReviewPhoneAuth(pool);
     return;
   }
 
@@ -190,6 +210,7 @@ export async function initDatabase() {
   await ensurePropertyTypesColumn(pool);
   await ensureConsultationContactNumberColumn(pool);
   await ensureReviewApproveTokens(pool);
+  await ensureReviewPhoneAuth(pool);
 }
 
 async function ensureConsultationContactNumberColumn(pool) {
@@ -242,4 +263,36 @@ async function ensureReviewApproveTokens(pool) {
       token
     ]);
   }
+}
+
+async function ensureReviewPhoneAuth(pool) {
+  await pool.query(`
+    ALTER TABLE client_reviews
+    ADD COLUMN IF NOT EXISTS phone VARCHAR(15)
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS review_otp_challenges (
+      id SERIAL PRIMARY KEY,
+      phone VARCHAR(15) NOT NULL,
+      otp_hash VARCHAR(128) NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL,
+      attempts SMALLINT NOT NULL DEFAULT 0,
+      verified_at TIMESTAMPTZ,
+      auth_token VARCHAR(64) UNIQUE,
+      auth_expires_at TIMESTAMPTZ,
+      auth_used_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_review_otp_phone_created
+      ON review_otp_challenges (phone, created_at DESC)
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_review_otp_auth_token
+      ON review_otp_challenges (auth_token)
+  `);
 }

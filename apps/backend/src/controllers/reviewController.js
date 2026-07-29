@@ -3,7 +3,9 @@ import {
   markReviewEmailFailed,
   markReviewEmailSent
 } from "../repositories/reviewRepository.js";
+import { consumeAuthToken } from "../repositories/reviewOtpRepository.js";
 import { sendReviewEmail, isEmailConfigured } from "../services/emailService.js";
+import { normalizeIndianPhone } from "../utils/phone.js";
 import { validateReviewBody } from "../utils/validateReview.js";
 
 const SUCCESS_MESSAGE =
@@ -35,7 +37,29 @@ export async function reviewController(req, res) {
     return res.status(400).json({ error: validation.errors.join(" ") });
   }
 
-  const data = validation.data;
+  const phone = normalizeIndianPhone(req.body?.phone);
+  const authToken =
+    typeof req.body?.authToken === "string" ? req.body.authToken.trim() : "";
+
+  if (!phone) {
+    return res.status(401).json({
+      error: "Verify your mobile number with OTP before submitting feedback."
+    });
+  }
+
+  let auth;
+  try {
+    auth = await consumeAuthToken(phone, authToken);
+  } catch (err) {
+    console.error("Review auth check error:", err.message);
+    return res.status(503).json({ error: "Could not verify authorization. Please try again." });
+  }
+
+  if (!auth.ok) {
+    return res.status(401).json({ error: auth.error });
+  }
+
+  const data = { ...validation.data, phone };
   let reviewId;
   let approveToken;
 

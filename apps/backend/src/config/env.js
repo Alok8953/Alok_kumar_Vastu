@@ -33,6 +33,8 @@ export const env = {
   gmailUser: process.env.GMAIL_USER || "alokkmishra06@gmail.com",
   gmailAppPassword: process.env.GMAIL_APP_PASSWORD || "",
   toEmail: process.env.TO_EMAIL || "alokkmishra06@gmail.com",
+  fast2smsApiKey: process.env.FAST2SMS_API_KEY || "",
+  otpDebug: process.env.OTP_DEBUG === "true",
   databaseUrl: databaseUrl || null,
   db: fromUrl || {
     host: process.env.DB_HOST || "localhost",
