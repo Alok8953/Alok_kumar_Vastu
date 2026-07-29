@@ -1825,6 +1825,76 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
 
 .testimonials-cta-row { margin-top: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.85rem 1.2rem; }
 .testimonials-cta-note { margin: 0; color: var(--text-soft); font-size: 0.9rem; max-width: 42ch; }
+.clients-feedback-section {
+  padding: clamp(1.35rem, 3vw, 2rem) 0;
+}
+.clients-feedback-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.15rem 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+}
+.clients-feedback-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+.clients-feedback-heading {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.45rem, 3.2vw, 2rem);
+  line-height: 1.15;
+  color: var(--heading);
+}
+.clients-feedback-chevron {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid rgba(185, 140, 47, 0.85);
+  background: #fff;
+  color: #9a6b1a;
+  box-shadow: 0 2px 8px rgba(154, 107, 26, 0.18);
+  transition: transform 0.28s ease, background 0.2s ease;
+}
+.clients-feedback-chevron svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+.clients-feedback-toggle.is-open .clients-feedback-chevron {
+  transform: rotate(180deg);
+  background: rgba(200, 155, 60, 0.18);
+}
+.clients-feedback-panel {
+  margin-top: 0.45rem;
+  animation: clientsFeedbackIn 0.25s ease;
+}
+@keyframes clientsFeedbackIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.clients-feedback-intro {
+  margin: 0 0 0.75rem;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  max-width: 65ch;
+}
+.clients-feedback-panel .testimonials-cta-row {
+  margin-top: 0.55rem;
+}
 .form-label {
   display: block;
   margin-bottom: 0.45rem;
