@@ -6,7 +6,7 @@ function ChevronIcon() {
       <path
         d="M6 9l6 6 6-6"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="2.75"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -19,10 +19,21 @@ function ChevronIcon() {
  * @param {Array<{ id: string, title: string, badge?: string, content: import('react').ReactNode }>} props.items
  * @param {string} [props.className]
  * @param {boolean} [props.allowMultiple=true]
+ * @param {boolean} [props.defaultOpenFirst=false]
  */
-export function Accordion({ items, className = "", allowMultiple = true }) {
+export function Accordion({
+  items,
+  className = "",
+  allowMultiple = true,
+  defaultOpenFirst = false
+}) {
   const baseId = useId();
-  const [openIds, setOpenIds] = useState(() => new Set());
+  const [openIds, setOpenIds] = useState(() => {
+    if (defaultOpenFirst && items[0]?.id) {
+      return new Set([items[0].id]);
+    }
+    return new Set();
+  });
 
   const toggle = useCallback(
     (id) => {

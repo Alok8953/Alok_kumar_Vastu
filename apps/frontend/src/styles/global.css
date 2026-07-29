@@ -2157,12 +2157,42 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   background: linear-gradient(145deg, rgba(232, 199, 102, 0.25), rgba(200, 155, 60, 0.12));
   border: 1px solid rgba(200, 155, 60, 0.35);
   color: var(--gold-dark);
-  transition: transform 0.3s ease, background 0.2s ease;
+  transition: transform 0.3s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 .accordion-chevron-svg { width: 1.15rem; height: 1.15rem; }
 .accordion-item.is-open .accordion-icon {
   transform: rotate(180deg);
   background: linear-gradient(145deg, rgba(232, 199, 102, 0.4), rgba(200, 155, 60, 0.2));
+}
+.accordion--testimonials .accordion-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 2px solid rgba(185, 140, 47, 0.85);
+  background: #fff;
+  color: #9a6b1a;
+  box-shadow: 0 2px 8px rgba(154, 107, 26, 0.18);
+}
+.accordion--testimonials .accordion-chevron-svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+.accordion--testimonials .accordion-item.is-open .accordion-icon {
+  background: rgba(200, 155, 60, 0.2);
+  border-color: var(--gold-dark);
+  color: var(--gold-dark);
+  box-shadow: 0 0 0 2px rgba(200, 155, 60, 0.2);
+}
+.accordion--testimonials .accordion-trigger:hover .accordion-icon {
+  background: rgba(200, 155, 60, 0.14);
+  transform: scale(1.06);
+}
+.accordion--testimonials .accordion-item.is-open .accordion-trigger:hover .accordion-icon {
+  transform: rotate(180deg) scale(1.06);
+}
+.accordion--testimonials .accordion-panel-inner {
+  border-top: 1px solid rgba(200, 155, 60, 0.22);
+  margin-top: 0.15rem;
+  padding-top: 0.85rem;
 }
 .accordion-panel {
   display: grid;

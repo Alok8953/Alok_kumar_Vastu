@@ -16,7 +16,11 @@ export function TestimonialsContent({ onOpenReview }) {
           Had a consultation? Enter your mobile number and email to share feedback.
         </p>
       </div>
-      <Accordion className="accordion--testimonials" items={accordionItems} />
+      <Accordion
+        className="accordion--testimonials"
+        items={accordionItems}
+        allowMultiple={false}
+      />
     </>
   );
 }
