@@ -3,17 +3,6 @@ import { ServicesContent } from "./sections/ServicesSection.jsx";
 
 export function ServicesDrawer({ isOpen, onClose }) {
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
     function handleKey(e) {
       if (e.key === "Escape") onClose();
     }

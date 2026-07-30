@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { AboutContent } from "./sections/AboutSection.jsx";
+import { TestimonialsContent } from "./sections/TestimonialsSection.jsx";
 
-export function AboutDrawer({ isOpen, onClose }) {
+export function FeedbackDrawer({ isOpen, onClose, onOpenReview }) {
   useEffect(() => {
     function handleKey(e) {
       if (e.key === "Escape") onClose();
@@ -19,29 +19,28 @@ export function AboutDrawer({ isOpen, onClose }) {
       <button
         type="button"
         className="drawer-backdrop"
-        aria-label="Close about panel"
+        aria-label="Close feedback panel"
         onClick={onClose}
       />
       <aside
         className="side-drawer"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="about-drawer-title"
+        aria-labelledby="feedback-drawer-title"
       >
         <div className="side-drawer-inner">
           <header className="side-drawer-header">
             <button type="button" className="drawer-close" onClick={onClose} aria-label="Close">
               &#x2715;
             </button>
-            <p className="section-kicker">About The Approach</p>
-            <h2 id="about-drawer-title">Most Problems Are Not Random</h2>
+            <p className="section-kicker">Real Results</p>
+            <h2 id="feedback-drawer-title">Clients Feedback</h2>
             <p className="section-intro">
-              Most problems are not random. They are structured patterns caused by wrong decisions,
-              a misaligned environment, and lack of clarity.
+              Homes &amp; offices transformed after alignment.
             </p>
           </header>
           <div className="side-drawer-body">
-            <AboutContent />
+            <TestimonialsContent onOpenReview={onOpenReview} />
           </div>
         </div>
       </aside>

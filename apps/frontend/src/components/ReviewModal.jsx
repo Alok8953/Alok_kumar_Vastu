@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { postApi } from "../lib/postApi.js";
 
 const INITIAL_FORM = {
@@ -42,7 +43,7 @@ function validateForm(form) {
   return errors;
 }
 
-export function ReviewModal({ isOpen, onClose }) {
+export function ReviewModal({ isOpen, onClose, onSubmitted }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -52,18 +53,13 @@ export function ReviewModal({ isOpen, onClose }) {
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
       setTimeout(() => firstInputRef.current?.focus(), 50);
     } else {
-      document.body.style.overflow = "";
       setForm(INITIAL_FORM);
       setStatus("idle");
       setErrorMsg("");
       setHoverRating(0);
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -108,6 +104,7 @@ export function ReviewModal({ isOpen, onClose }) {
       });
 
       setStatus("success");
+      onSubmitted?.();
     } catch (err) {
       setStatus("error");
       setErrorMsg(err.message || "Could not submit review. Please try again.");
@@ -120,7 +117,7 @@ export function ReviewModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className="modal-overlay"
       ref={overlayRef}
@@ -266,6 +263,7 @@ export function ReviewModal({ isOpen, onClose }) {
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

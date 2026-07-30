@@ -1,6 +1,7 @@
 import { PhoneContactLink } from "../PhoneContactLink.jsx";
 
-export function SiteFooter({ onOpenAbout, onOpenServices }) {  return (
+export function SiteFooter({ onOpenAbout, onOpenServices, onOpenFeedback }) {
+  return (
     <footer className="site-footer">
       <div className="container footer-grid">
         <section>
@@ -30,7 +31,9 @@ export function SiteFooter({ onOpenAbout, onOpenServices }) {  return (
               <a href="#process">How It Works</a>
             </li>
             <li>
-              <a href="#testimonials">Clients Feedback</a>
+              <button type="button" className="footer-drawer-link" onClick={onOpenFeedback}>
+                Clients Feedback
+              </button>
             </li>
             <li>
               <a href="#positioning">Our Approach</a>

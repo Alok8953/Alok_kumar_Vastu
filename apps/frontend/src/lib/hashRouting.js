@@ -1,4 +1,4 @@
-export const DRAWER_HASH_IDS = ["about", "services"];
+export const DRAWER_HASH_IDS = ["about", "services", "feedback"];
 
 export function getHashId() {
   return window.location.hash.replace(/^#/, "");

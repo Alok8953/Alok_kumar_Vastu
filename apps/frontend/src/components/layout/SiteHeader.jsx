@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CTA_BUTTON_LABEL } from "../../constants/siteContent.js";
 
-const DRAWER_TYPES = new Set(["about", "services"]);
+const DRAWER_TYPES = new Set(["about", "services", "feedback"]);
 
 export function SiteHeader({
   isMenuOpen,

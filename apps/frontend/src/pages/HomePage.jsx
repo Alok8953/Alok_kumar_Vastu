@@ -6,9 +6,7 @@ import { CredentialsBanner } from "../components/sections/CredentialsBanner";
 import { FrameworkLayerCards } from "../components/sections/FrameworkLayerCards.jsx";
 import { SpecializedServiceCards } from "../components/sections/SpecializedServiceCards.jsx";
 import { WhyDifferentiatorCards } from "../components/sections/WhyDifferentiatorCards.jsx";
-import { ClientsFeedbackSection } from "../components/sections/ClientsFeedbackSection.jsx";
-
-export function HomePage({ onOpenModal, onOpenServices, onOpenReview }) {
+export function HomePage({ onOpenModal, onOpenServices }) {
   return (
     <main id="main-content">
       <section className="hero section panel" id="home">
@@ -82,8 +80,6 @@ export function HomePage({ onOpenModal, onOpenServices, onOpenReview }) {
       >
         <WhyDifferentiatorCards />
       </ParallaxRevealSection>
-
-      <ClientsFeedbackSection onOpenReview={onOpenReview} />
 
       <section className="cta-band section panel" id="contact">
         <div className="container cta-band-wrap">

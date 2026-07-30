@@ -88,18 +88,13 @@ export function CallbackModal({ isOpen, onClose }) {
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
       setTimeout(() => firstInputRef.current?.focus(), 50);
     } else {
-      document.body.style.overflow = "";
       setForm(INITIAL_FORM);
       setStatus("idle");
       setErrorMsg("");
       setPendingPropertyType(null);
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [isOpen]);
 
   useEffect(() => {

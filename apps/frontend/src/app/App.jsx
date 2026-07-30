@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SiteHeader } from "../components/layout/SiteHeader";
 import { SiteFooter } from "../components/layout/SiteFooter";
 import { FooterExpandableBand } from "../components/layout/FooterExpandableBand";
@@ -8,7 +8,9 @@ import { CallbackModal } from "../components/CallbackModal";
 import { ReviewModal } from "../components/ReviewModal";
 import { ServicesDrawer } from "../components/ServicesDrawer";
 import { AboutDrawer } from "../components/AboutDrawer";
+import { FeedbackDrawer } from "../components/FeedbackDrawer";
 import { WhatsAppButton } from "../components/WhatsAppButton";
+import { useBodyScrollLock } from "../hooks/useBodyScrollLock.js";
 import {
   clearDrawerHash,
   getDrawerFromHash,
@@ -21,7 +23,8 @@ const navItems = [
   { href: "#home", label: "Home" },
   { type: "about", label: "About" },
   { type: "services", label: "Services" },
-  { href: "#contact", label: "Contact" }
+  { href: "#contact", label: "Contact" },
+  { type: "feedback", label: "Feedback" }
 ];
 
 function getAdminRoute() {
@@ -36,13 +39,31 @@ export function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [activeDrawer, setActiveDrawer] = useState(() => getDrawerFromHash());
+  const isOverlayOpen = isModalOpen || isReviewOpen || activeDrawer !== null;
+  const isModalOpenRef = useRef(isModalOpen);
+  const isReviewOpenRef = useRef(isReviewOpen);
+
+  useBodyScrollLock(isOverlayOpen);
+
+  useEffect(() => {
+    isModalOpenRef.current = isModalOpen;
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    isReviewOpenRef.current = isReviewOpen;
+  }, [isReviewOpen]);
 
   useEffect(() => {
     function syncHashRoute() {
       setAdminRoute(getAdminRoute());
 
       const drawerId = getDrawerFromHash();
-      setActiveDrawer(drawerId);
+      if (drawerId && (isModalOpenRef.current || isReviewOpenRef.current)) {
+        clearDrawerHash();
+        setActiveDrawer(null);
+      } else {
+        setActiveDrawer(drawerId);
+      }
 
       if (!drawerId) {
         const hashId = getHashId();
@@ -63,16 +84,29 @@ export function App() {
   }, []);
 
   function openModal() {
+    closeDrawer();
+    setIsReviewOpen(false);
     setIsModalOpen(true);
     setIsMenuOpen(false);
   }
 
   function openReview() {
+    closeDrawer();
+    setIsModalOpen(false);
+    setIsReviewOpen(true);
+    setIsMenuOpen(false);
+  }
+
+  function openReviewFromFeedback() {
+    closeDrawer();
+    setIsModalOpen(false);
     setIsReviewOpen(true);
     setIsMenuOpen(false);
   }
 
   function handleOpenDrawer(id) {
+    setIsModalOpen(false);
+    setIsReviewOpen(false);
     setActiveDrawer(id);
     setHash(id);
     setIsMenuOpen(false);
@@ -133,17 +167,29 @@ export function App() {
       <HomePage
         onOpenModal={openModal}
         onOpenServices={() => handleOpenDrawer("services")}
-        onOpenReview={openReview}
       />
       <FooterExpandableBand />
       <SiteFooter
         onOpenAbout={() => handleOpenDrawer("about")}
         onOpenServices={() => handleOpenDrawer("services")}
+        onOpenFeedback={() => handleOpenDrawer("feedback")}
       />
       <AboutDrawer isOpen={activeDrawer === "about"} onClose={closeDrawer} />
       <ServicesDrawer isOpen={activeDrawer === "services"} onClose={closeDrawer} />
-      <CallbackModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-      <ReviewModal isOpen={isReviewOpen} onClose={() => setIsReviewOpen(false)} />
+      <FeedbackDrawer
+        isOpen={activeDrawer === "feedback" && !isReviewOpen}
+        onClose={closeDrawer}
+        onOpenReview={openReviewFromFeedback}
+      />
+      <CallbackModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+      <ReviewModal
+        isOpen={isReviewOpen}
+        onClose={() => setIsReviewOpen(false)}
+        onSubmitted={closeDrawer}
+      />
       <WhatsAppButton />
     </>
   );
