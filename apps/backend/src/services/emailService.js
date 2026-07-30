@@ -82,7 +82,7 @@ function emailSection(title) {
 }
 
 function buildCallbackMailContent(data) {
-  const concerns = data.primaryConcerns.map((c) => escapeHtml(c)).join(", ");
+  const concerns = (data.primaryConcerns || []).map((c) => escapeHtml(c)).join(", ");
   const propertyTypes = (data.propertyTypes || []).map((t) => escapeHtml(t)).join(", ");
   const contactLabel =
     data.consultationMethod === "WhatsApp Call"
@@ -105,14 +105,14 @@ function buildCallbackMailContent(data) {
         ${emailRow("Mobile", escapeHtml(data.mobile))}
         ${emailRow("Email", escapeHtml(data.email || "Not provided"), true)}
         ${emailSection("Property & Concerns")}
-        ${emailRow("Property Type(s)", propertyTypes, true)}
-        ${emailRow("Primary Concern(s)", concerns)}
-        ${emailRow("Concern Detail", `<span style="white-space: pre-wrap;">${escapeHtml(data.concernDetail)}</span>`, true)}
-        ${emailRow("Property Location", escapeHtml(data.propertyLocation))}
-        ${emailRow("Floor Plan Available", data.hasFloorPlan ? "Yes" : "No", true)}
+        ${emailRow("Property Type(s)", propertyTypes || "Not provided", true)}
+        ${emailRow("Primary Concern(s)", concerns || "Not provided")}
+        ${emailRow("Concern Detail", `<span style="white-space: pre-wrap;">${escapeHtml(data.concernDetail || "Not provided")}</span>`, true)}
+        ${emailRow("Property Location", escapeHtml(data.propertyLocation || "Not provided"))}
+        ${emailRow("Floor Plan Available", data.hasFloorPlan == null ? "Not provided" : data.hasFloorPlan ? "Yes" : "No", true)}
         ${emailSection("Callback Preference")}
-        ${emailRow("Preferred Time", escapeHtml(data.preferredTimeSlot), true)}
-        ${emailRow("Consultation Method", escapeHtml(data.consultationMethod))}
+        ${emailRow("Preferred Time", escapeHtml(data.preferredTimeSlot || "Not provided"), true)}
+        ${emailRow("Consultation Method", escapeHtml(data.consultationMethod || "Not provided"))}
         ${emailRow(contactLabel, `<strong style="font-size: 16px;">${escapeHtml(data.consultationContactNumber || "Not provided")}</strong>`, true)}
         ${emailRow("How They Heard About Us", escapeHtml(data.referralSource || "Not specified"))}
       </table>
@@ -132,21 +132,21 @@ function buildCallbackMailContent(data) {
     `Email: ${data.email || "Not provided"}`,
     "",
     "PROPERTY & CONCERNS",
-    `Property Type(s): ${(data.propertyTypes || []).join(", ")}`,
-    `Primary Concern(s): ${data.primaryConcerns.join(", ")}`,
-    `Concern Detail: ${data.concernDetail}`,
-    `Property Location: ${data.propertyLocation}`,
-    `Floor Plan: ${data.hasFloorPlan ? "Yes" : "No"}`,
+    `Property Type(s): ${(data.propertyTypes || []).join(", ") || "Not provided"}`,
+    `Primary Concern(s): ${(data.primaryConcerns || []).join(", ") || "Not provided"}`,
+    `Concern Detail: ${data.concernDetail || "Not provided"}`,
+    `Property Location: ${data.propertyLocation || "Not provided"}`,
+    `Floor Plan: ${data.hasFloorPlan == null ? "Not provided" : data.hasFloorPlan ? "Yes" : "No"}`,
     "",
     "CALLBACK PREFERENCE",
-    `Preferred Time: ${data.preferredTimeSlot}`,
-    `Consultation Method: ${data.consultationMethod}`,
+    `Preferred Time: ${data.preferredTimeSlot || "Not provided"}`,
+    `Consultation Method: ${data.consultationMethod || "Not provided"}`,
     `${contactLabel}: ${data.consultationContactNumber || "Not provided"}`,
     `How They Heard About Us: ${data.referralSource || "Not specified"}`
   ];
 
   return {
-    subject: `New Vastu Callback — ${data.fullName} (${data.consultationMethod})`,
+    subject: `New Vastu Callback — ${data.fullName}${data.consultationMethod ? ` (${data.consultationMethod})` : ""}`,
     html,
     text: textLines.join("\n"),
     replyTo: data.email ? data.email : env.gmailUser
@@ -210,36 +210,49 @@ function createGmailTransporter() {
   });
 }
 
-async function deliverEmail({ subject, html, text, replyTo }) {
+async function sendWithResend({ subject, html, text, replyTo }) {
+  const resend = new Resend(env.resendApiKey);
+  const payload = {
+    from: env.resendFrom,
+    to: [env.toEmail],
+    subject,
+    html
+  };
+
+  if (text) payload.text = text;
+  if (replyTo) payload.replyTo = replyTo;
+
+  const { error } = await resend.emails.send(payload);
+  if (error) {
+    throw new Error(error.message || "Resend email failed.");
+  }
+}
+
+async function sendWithGmail({ subject, html, text, replyTo }) {
+  const transporter = createGmailTransporter();
+  await transporter.sendMail({
+    from: `"Vastu Website" <${env.gmailUser}>`,
+    to: env.toEmail,
+    subject,
+    html,
+    text,
+    replyTo
+  });
+}
+
+async function deliverEmail(mail) {
   if (isResendConfigured()) {
-    const resend = new Resend(env.resendApiKey);
-    const payload = {
-      from: env.resendFrom,
-      to: [env.toEmail],
-      subject,
-      html
-    };
-
-    if (text) payload.text = text;
-    if (replyTo) payload.replyTo = replyTo;
-
-    const { error } = await resend.emails.send(payload);
-    if (error) {
-      throw new Error(error.message || "Resend email failed.");
+    try {
+      await sendWithResend(mail);
+      return;
+    } catch (resendError) {
+      if (!isGmailConfigured()) throw resendError;
+      console.warn("Resend failed; retrying through Gmail:", resendError.message);
     }
-    return;
   }
 
   if (isGmailConfigured()) {
-    const transporter = createGmailTransporter();
-    await transporter.sendMail({
-      from: `"Vastu Website" <${env.gmailUser}>`,
-      to: env.toEmail,
-      subject,
-      html,
-      text,
-      replyTo
-    });
+    await sendWithGmail(mail);
     return;
   }
 

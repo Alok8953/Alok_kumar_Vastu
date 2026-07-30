@@ -3,6 +3,7 @@
   --topbar-bg: #a67c52;
   --header-bg: #f7f2ec;
   --header-height: 92px;
+  --surface-alt: #f0e9e0;
   --bg: #ffffff;
   --bg-alt: #fbfbfb;
   --text: #4a2e1e;
@@ -27,7 +28,7 @@ body {
   margin: 0;
   font-family: "Poppins", sans-serif;
   color: var(--text);
-  background: var(--bg);
+  background: var(--header-bg);
   line-height: 1.6;
   overflow-x: clip;
 }
@@ -36,8 +37,9 @@ a { color: inherit; text-decoration: none; }
 .container { width: min(var(--container), calc(100% - 2rem)); margin: 0 auto; }
 .section { padding: clamp(2.25rem, 5vw, 3.3rem) 0; position: relative; }
 .panel { border-top: 1px solid var(--border); }
-.section.panel:not(.hero):not(.cta-band) { background: var(--bg); }
-.section.panel:not(.hero):not(.cta-band):nth-of-type(even) { background: var(--bg-alt); }
+.section.panel:not(.hero):not(.cta-band) { background: var(--header-bg); }
+.section.panel:not(.hero):not(.cta-band):nth-of-type(even) { background: var(--surface-alt); }
+.hero.section.panel + .section.panel { border-top: none; }
 .section.panel:not(.hero):not(.cta-band)::before {
   content: "✦";
   position: absolute;
@@ -383,8 +385,9 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
     transparent 0%,
     rgba(26, 18, 8, 0.45) 38%,
     rgba(26, 18, 8, 0.82) 68%,
-    rgba(58, 42, 28, 0.94) 86%,
-    var(--bg) 100%
+    rgba(58, 42, 28, 0.88) 84%,
+    rgba(235, 228, 218, 0.96) 94%,
+    var(--header-bg) 100%
   );
   pointer-events: none;
   z-index: 3;
@@ -567,7 +570,7 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.8rem 1rem;
-  background: var(--bg-alt);
+  background: rgba(255, 255, 255, 0.58);
   color: var(--text);
 }
 .highlight-strip--compact {
@@ -1143,6 +1146,14 @@ h2 { font-family: "Playfair Display", serif; font-size: clamp(1.55rem, 3vw, 2.8r
   border-top: none;
   background-color: #1a1208;
   background-image:
+    linear-gradient(
+      180deg,
+      var(--header-bg) 0%,
+      rgba(235, 228, 218, 0.35) 4%,
+      rgba(26, 18, 8, 0.72) 14%,
+      rgba(26, 18, 8, 0.92) 24%,
+      transparent 38%
+    ),
     linear-gradient(90deg, rgba(0, 0, 0, 0.78) 0%, rgba(74, 46, 30, 0.65) 100%),
     url("/assets/vastu-hero-bg.jpg?v=16");
   background-size: cover;

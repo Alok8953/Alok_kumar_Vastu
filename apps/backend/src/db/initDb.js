@@ -20,11 +20,11 @@ CREATE TABLE IF NOT EXISTS callback_requests (
   user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   property_types TEXT[] NOT NULL,
   primary_concerns TEXT[] NOT NULL,
-  concern_detail TEXT NOT NULL,
-  property_location VARCHAR(255) NOT NULL,
-  has_floor_plan BOOLEAN NOT NULL,
-  preferred_time_slot VARCHAR(50) NOT NULL,
-  consultation_method VARCHAR(50) NOT NULL,
+  concern_detail TEXT,
+  property_location VARCHAR(255),
+  has_floor_plan BOOLEAN,
+  preferred_time_slot VARCHAR(50),
+  consultation_method VARCHAR(50),
   consultation_contact_number VARCHAR(20),
   referral_source VARCHAR(100),
   status VARCHAR(50) NOT NULL DEFAULT 'new',
@@ -201,6 +201,7 @@ export async function initDatabase() {
     await migrateLegacyCallbackTable(pool);
     await ensurePropertyTypesColumn(pool);
     await ensureConsultationContactNumberColumn(pool);
+    await ensureOptionalCallbackFields(pool);
     await ensureReviewApproveTokens(pool);
     await ensureReviewPhoneAuth(pool);
     return;
@@ -209,6 +210,7 @@ export async function initDatabase() {
   await pool.query(SCHEMA_SQL);
   await ensurePropertyTypesColumn(pool);
   await ensureConsultationContactNumberColumn(pool);
+  await ensureOptionalCallbackFields(pool);
   await ensureReviewApproveTokens(pool);
   await ensureReviewPhoneAuth(pool);
 }
@@ -217,6 +219,17 @@ async function ensureConsultationContactNumberColumn(pool) {
   await pool.query(`
     ALTER TABLE callback_requests
     ADD COLUMN IF NOT EXISTS consultation_contact_number VARCHAR(20)
+  `);
+}
+
+async function ensureOptionalCallbackFields(pool) {
+  await pool.query(`
+    ALTER TABLE callback_requests
+      ALTER COLUMN concern_detail DROP NOT NULL,
+      ALTER COLUMN property_location DROP NOT NULL,
+      ALTER COLUMN has_floor_plan DROP NOT NULL,
+      ALTER COLUMN preferred_time_slot DROP NOT NULL,
+      ALTER COLUMN consultation_method DROP NOT NULL
   `);
 }
 

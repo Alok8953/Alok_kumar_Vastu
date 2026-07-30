@@ -25,20 +25,16 @@ function validateForm(form) {
   else if (!isValidPhoneDigits(form.mobile)) {
     errors.push(phoneValidationMessage("Mobile number"));
   }
-  if (form.propertyTypes.length === 0) errors.push("Select at least one property type.");
-  if (form.primaryConcerns.length === 0) errors.push("Select at least one primary concern.");
-  if (!form.concernDetail.trim()) errors.push("Please describe your concern in detail.");
-  if (!form.propertyLocation.trim()) errors.push("Property Location is required.");
-  if (form.hasFloorPlan === "") errors.push("Floor Plan selection is required.");
-  if (!form.preferredTimeSlot) errors.push("Preferred Time for Callback is required.");
-  if (!form.consultationMethod) errors.push("Preferred Consultation Method is required.");
-  else if (!form.consultationContactNumber.trim()) {
-    errors.push(
-      form.consultationMethod === CONSULTATION_METHOD_PHONE
-        ? "Phone number for callback is required."
-        : "WhatsApp number is required."
-    );
-  } else if (!isValidPhoneDigits(form.consultationContactNumber)) {
+  if (
+    form.email.trim() &&
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())
+  ) {
+    errors.push("Enter a valid email address.");
+  }
+  if (
+    form.consultationContactNumber.trim() &&
+    !isValidPhoneDigits(form.consultationContactNumber)
+  ) {
     errors.push(
       form.consultationMethod === CONSULTATION_METHOD_PHONE
         ? phoneValidationMessage("Phone number for callback")
@@ -205,12 +201,12 @@ export function CallbackModal({ isOpen, onClose }) {
       email: form.email.trim() || null,
       propertyTypes: form.propertyTypes,
       primaryConcerns: form.primaryConcerns,
-      concernDetail: form.concernDetail.trim(),
-      propertyLocation: form.propertyLocation.trim(),
-      hasFloorPlan: form.hasFloorPlan === "yes",
-      preferredTimeSlot: form.preferredTimeSlot,
-      consultationMethod: form.consultationMethod,
-      consultationContactNumber: form.consultationContactNumber.trim(),
+      concernDetail: form.concernDetail.trim() || null,
+      propertyLocation: form.propertyLocation.trim() || null,
+      hasFloorPlan: form.hasFloorPlan === "" ? null : form.hasFloorPlan === "yes",
+      preferredTimeSlot: form.preferredTimeSlot || null,
+      consultationMethod: form.consultationMethod || null,
+      consultationContactNumber: form.consultationContactNumber.trim() || null,
       referralSource: form.referralSource || null
     };
 
@@ -313,7 +309,7 @@ export function CallbackModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              <OptionGroup legend="Property Type (select one or more)" required>
+              <OptionGroup legend="Property Type (select one or more)">
                 <div className="option-grid">
                   {PROPERTY_TYPES.map((type) => (
                     <CheckboxOption
@@ -351,7 +347,7 @@ export function CallbackModal({ isOpen, onClose }) {
                 </div>
               ) : null}
 
-              <OptionGroup legend="What is your primary concern?" required>
+              <OptionGroup legend="What is your primary concern?">
                 <div className="option-grid">
                   {PRIMARY_CONCERNS.map((concern) => (
                     <CheckboxOption
@@ -367,7 +363,7 @@ export function CallbackModal({ isOpen, onClose }) {
 
               <div className="form-group">
                 <label htmlFor="cb-concernDetail">
-                  Please describe your concern in detail <span className="required-mark">*</span>
+                  Please describe your concern in detail
                 </label>
                 <textarea
                   id="cb-concernDetail"
@@ -375,13 +371,12 @@ export function CallbackModal({ isOpen, onClose }) {
                   rows={4}
                   value={form.concernDetail}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
               <div className="form-group">
                 <label htmlFor="cb-propertyLocation">
-                  Property Location (City &amp; State) <span className="required-mark">*</span>
+                  Property Location (City &amp; State)
                 </label>
                 <input
                   id="cb-propertyLocation"
@@ -389,11 +384,10 @@ export function CallbackModal({ isOpen, onClose }) {
                   type="text"
                   value={form.propertyLocation}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
-              <OptionGroup legend="Do you have a Floor Plan / Layout of the Property?" required>
+              <OptionGroup legend="Do you have a Floor Plan / Layout of the Property?">
                 <div className="option-row">
                   <RadioOption
                     name="hasFloorPlan"
@@ -412,7 +406,7 @@ export function CallbackModal({ isOpen, onClose }) {
                 </div>
               </OptionGroup>
 
-              <OptionGroup legend="Preferred Time for Callback" required>
+              <OptionGroup legend="Preferred Time for Callback">
                 <div className="option-grid option-grid-compact">
                   {TIME_SLOTS.map((slot) => (
                     <RadioOption
@@ -427,7 +421,7 @@ export function CallbackModal({ isOpen, onClose }) {
                 </div>
               </OptionGroup>
 
-              <OptionGroup legend="Preferred Consultation Method" required>
+              <OptionGroup legend="Preferred Consultation Method">
                 <div className="option-row">
                   {CONSULTATION_METHODS.map((method) => (
                     <RadioOption
@@ -445,7 +439,7 @@ export function CallbackModal({ isOpen, onClose }) {
               {form.consultationMethod === CONSULTATION_METHOD_PHONE ? (
                 <div className="form-group">
                   <label htmlFor="cb-consultationPhone">
-                    Phone Number for Callback <span className="required-mark">*</span>
+                    Phone Number for Callback
                   </label>
                   <label className="same-as-above">
                     <input
@@ -464,7 +458,6 @@ export function CallbackModal({ isOpen, onClose }) {
                     maxLength={PHONE_DIGIT_LIMIT}
                     value={form.consultationContactNumber}
                     onChange={handleChange}
-                    required
                     autoComplete="tel"
                     placeholder="10-digit phone number"
                     readOnly={form.useSameMobileForContact}
@@ -475,7 +468,7 @@ export function CallbackModal({ isOpen, onClose }) {
               {form.consultationMethod === CONSULTATION_METHOD_WHATSAPP ? (
                 <div className="form-group">
                   <label htmlFor="cb-consultationWhatsApp">
-                    WhatsApp Number <span className="required-mark">*</span>
+                    WhatsApp Number
                   </label>
                   <label className="same-as-above">
                     <input
@@ -494,7 +487,6 @@ export function CallbackModal({ isOpen, onClose }) {
                     maxLength={PHONE_DIGIT_LIMIT}
                     value={form.consultationContactNumber}
                     onChange={handleChange}
-                    required
                     autoComplete="tel"
                     placeholder="10-digit WhatsApp number"
                     readOnly={form.useSameMobileForContact}
