@@ -257,7 +257,7 @@ async function deliverEmail(mail) {
   }
 
   throw new Error(
-    "Email is not configured. Set RESEND_API_KEY (Render) or GMAIL_APP_PASSWORD (local)."
+    "Email is not configured. Set RESEND_API_KEY (production) or GMAIL_APP_PASSWORD (local)."
   );
 }
 
