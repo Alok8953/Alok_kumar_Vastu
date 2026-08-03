@@ -34,6 +34,42 @@ function freePort(port) {
   }
 }
 
+/**
+ * `node --watch` re-binds a freed port within milliseconds, so stale dev
+ * servers from earlier terminals must be killed by process, not just by port.
+ */
+function killStaleDevProcesses() {
+  if (platform() !== "win32") return;
+
+  const currentPid = String(process.pid);
+  const query =
+    "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | " +
+    "Where-Object { $_.CommandLine -match 'src.server\\.js|vite\\.js|dev:inner' " +
+    "-and $_.CommandLine -notmatch 'cursor' } | " +
+    "Select-Object -ExpandProperty ProcessId";
+
+  try {
+    const output = execSync(`powershell -NoProfile -Command "${query}"`, {
+      encoding: "utf8"
+    });
+
+    for (const line of output.split("\n")) {
+      const pid = line.trim();
+      if (!pid || pid === currentPid) continue;
+      try {
+        execSync(`taskkill /F /PID ${pid}`, { stdio: "ignore" });
+        console.log(`Stopped stale dev process (PID ${pid})`);
+      } catch {
+        /* process may already be gone */
+      }
+    }
+  } catch {
+    /* no stale processes */
+  }
+}
+
+killStaleDevProcesses();
+
 for (const port of ports) {
   freePort(port);
 }
