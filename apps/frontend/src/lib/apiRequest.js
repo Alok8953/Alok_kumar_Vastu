@@ -13,8 +13,12 @@ function requestError({ status = 0, isTransient = false } = {}) {
 /**
  * JSON API helper (GET/POST/PATCH). Pass adminKey for /api/admin/* routes.
  */
-export async function apiRequest(path, { method = "GET", body, adminKey } = {}) {
-  const url = `${API_BASE_URL}${path}`;
+export async function apiRequest(
+  path,
+  { method = "GET", body, adminKey, timeoutMs = 15_000, baseUrl } = {}
+) {
+  const root = baseUrl !== undefined ? baseUrl : API_BASE_URL;
+  const url = `${root}${path}`;
   const headers = {};
 
   if (body !== undefined) {
@@ -26,7 +30,7 @@ export async function apiRequest(path, { method = "GET", body, adminKey } = {}) 
 
   let res;
   const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 15_000);
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
   try {
     res = await fetch(url, {
       method,

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { postApi } from "../lib/postApi.js";
+import { submitReview } from "../lib/submitReview.js";
 
 const INITIAL_FORM = {
   fullName: "",
@@ -30,27 +30,6 @@ function createSubmissionId() {
     return crypto.randomUUID();
   }
   return `review-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
-}
-
-function wait(ms) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
-
-async function submitReviewWithRetry(payload) {
-  const retryDelays = [0, 1500, 4000];
-  let lastError;
-
-  for (const delay of retryDelays) {
-    if (delay) await wait(delay);
-    try {
-      return await postApi("/api/reviews", payload);
-    } catch (error) {
-      lastError = error;
-      if (!error?.isTransient) throw error;
-    }
-  }
-
-  throw lastError;
 }
 
 function validateForm(form) {
@@ -150,7 +129,7 @@ export function ReviewModal({ isOpen, onClose, onSubmitted }) {
     setErrorMsg("");
 
     try {
-      await submitReviewWithRetry({
+      await submitReview({
         submissionId: submissionIdRef.current,
         fullName: form.fullName.trim(),
         countryCode: form.countryCode,

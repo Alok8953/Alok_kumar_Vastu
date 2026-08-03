@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
+    "dev": "node --env-file=.env --watch src/server.js",
+    "start": "node --env-file=.env src/server.js",
     "db:init": "node -e \"import('./src/db/initDb.js').then(m => m.initDatabase()).then(() => console.log('Database ready')).catch(e => { console.error(e.message); process.exit(1); })\""
   },
   "dependencies": {
