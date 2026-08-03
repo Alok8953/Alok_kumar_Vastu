@@ -3,6 +3,7 @@ import { createApp } from "./app.js";
 import { env } from "./config/env.js";
 import { initDatabase } from "./db/initDb.js";
 import { isEmailConfigured } from "./services/emailService.js";
+import { retryPendingReviewEmails } from "./services/reviewEmailRecoveryService.js";
 import { logStartup } from "./utils/logger.js";
 
 async function startServer() {
@@ -28,6 +29,10 @@ async function startServer() {
       console.warn(
         "Callback email is NOT configured. Form submissions will still be saved to PostgreSQL."
       );
+    } else {
+      void retryPendingReviewEmails().catch((error) => {
+        console.error("Pending review email recovery failed:", error.message);
+      });
     }
   });
 

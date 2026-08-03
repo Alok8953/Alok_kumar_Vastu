@@ -1,4 +1,5 @@
 import { env } from "./env.js";
+import { getAllowedSiteOrigins } from "./siteOrigins.js";
 
 /** Allow localhost, 127.0.0.1, and common LAN IPs used by Vite (host: true). */
 export function isAllowedDevOrigin(origin) {
@@ -23,7 +24,7 @@ export function corsOrigin(origin, callback) {
     return;
   }
 
-  if (origin === env.frontendOrigin) {
+  if (getAllowedSiteOrigins().has(origin)) {
     callback(null, true);
     return;
   }

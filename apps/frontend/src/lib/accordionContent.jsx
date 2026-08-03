@@ -5,6 +5,7 @@ import {
   TESTIMONIALS,
   WHY_DIFFERENTIATORS
 } from "../constants/siteContent.js";
+import { maskEmail } from "./maskEmail.js";
 
 export function buildProcessAccordionItems() {
   return CONSULTATION_STEPS.map((item) => ({
@@ -53,6 +54,8 @@ function formatStarDisplay(rating) {
 
 function testimonialToAccordionItem(item) {
   const rating = item.rating ?? 5;
+  const emailMasked =
+    item.emailMasked || (item.email ? maskEmail(item.email) : null);
   return {
     id: item.id,
     title: `${item.name} — ${item.city}`,
@@ -64,6 +67,9 @@ function testimonialToAccordionItem(item) {
         >
           {formatStarDisplay(rating)}
         </p>
+        {emailMasked ? (
+          <p className="accordion-testimonial-email">{emailMasked}</p>
+        ) : null}
         <blockquote className="accordion-testimonial-quote">&ldquo;{item.quote}&rdquo;</blockquote>
       </>
     )

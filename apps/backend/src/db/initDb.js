@@ -62,6 +62,7 @@ CREATE INDEX IF NOT EXISTS idx_email_logs_callback_request_id
 
 CREATE TABLE IF NOT EXISTS client_reviews (
   id SERIAL PRIMARY KEY,
+  submission_id VARCHAR(64) UNIQUE,
   full_name VARCHAR(255) NOT NULL,
   city VARCHAR(255),
   rating SMALLINT NOT NULL CHECK (rating >= 1 AND rating <= 5),
@@ -281,7 +282,17 @@ async function ensureReviewApproveTokens(pool) {
 async function ensureReviewPhoneAuth(pool) {
   await pool.query(`
     ALTER TABLE client_reviews
-    ADD COLUMN IF NOT EXISTS phone VARCHAR(15)
+    ADD COLUMN IF NOT EXISTS submission_id VARCHAR(64) UNIQUE
+  `);
+
+  await pool.query(`
+    ALTER TABLE client_reviews
+    ADD COLUMN IF NOT EXISTS phone VARCHAR(16)
+  `);
+
+  await pool.query(`
+    ALTER TABLE client_reviews
+    ALTER COLUMN phone TYPE VARCHAR(16)
   `);
 
   await pool.query(`

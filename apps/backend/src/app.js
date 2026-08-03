@@ -7,6 +7,7 @@ import callbackRoutes from "./routes/callbackRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import adminReviewRoutes from "./routes/adminReviewRoutes.js";
 import { attachFrontend, defaultFrontendDistPath } from "./middlewares/serveFrontend.js";
+import { canonicalHostRedirect } from "./middlewares/canonicalHostRedirect.js";
 import { notFound } from "./middlewares/notFound.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
@@ -25,6 +26,7 @@ export function createApp() {
     })
   );
   app.use(express.json());
+  app.use(canonicalHostRedirect);
 
   app.use("/api", healthRoutes);
   app.use("/api", callbackRoutes);

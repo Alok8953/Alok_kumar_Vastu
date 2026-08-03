@@ -13,6 +13,28 @@ export function normalizeIndianPhone(raw) {
   return null;
 }
 
+const COUNTRY_PHONE_RULES = {
+  "+91": /^[6-9]\d{9}$/,
+  "+1": /^\d{10}$/,
+  "+44": /^\d{10}$/,
+  "+61": /^\d{9}$/,
+  "+971": /^\d{9}$/,
+  "+65": /^\d{8}$/
+};
+
+/** Validate a selected country code and return an E.164-compatible number. */
+export function normalizeInternationalPhone(raw, rawCountryCode = "+91") {
+  const countryCode = String(rawCountryCode || "").trim();
+  const rule = COUNTRY_PHONE_RULES[countryCode];
+  if (!rule) return null;
+
+  const nationalNumber = String(raw || "").replace(/\D/g, "");
+  if (!rule.test(nationalNumber)) return null;
+
+  const normalized = `${countryCode}${nationalNumber}`;
+  return normalized.length <= 16 ? normalized : null;
+}
+
 export function maskPhone(phone) {
   if (!phone || phone.length < 4) return "****";
   return `${phone.slice(0, 2)}******${phone.slice(-2)}`;

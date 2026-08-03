@@ -4,6 +4,7 @@ import { postApi } from "../lib/postApi.js";
 
 const INITIAL_FORM = {
   fullName: "",
+  countryCode: "+91",
   phone: "",
   email: "",
   city: "",
@@ -11,19 +12,55 @@ const INITIAL_FORM = {
   reviewText: ""
 };
 
+const COUNTRY_OPTIONS = [
+  { code: "+91", label: "India", digits: 10, pattern: /^[6-9]\d{9}$/, placeholder: "10-digit mobile" },
+  { code: "+1", label: "US/Canada", digits: 10, pattern: /^\d{10}$/, placeholder: "10-digit number" },
+  { code: "+44", label: "UK", digits: 10, pattern: /^\d{10}$/, placeholder: "10-digit number" },
+  { code: "+61", label: "Australia", digits: 9, pattern: /^\d{9}$/, placeholder: "9-digit number" },
+  { code: "+971", label: "UAE", digits: 9, pattern: /^\d{9}$/, placeholder: "9-digit number" },
+  { code: "+65", label: "Singapore", digits: 8, pattern: /^\d{8}$/, placeholder: "8-digit number" }
+];
+
+function getCountryOption(countryCode) {
+  return COUNTRY_OPTIONS.find((option) => option.code === countryCode) || COUNTRY_OPTIONS[0];
+}
+
+function createSubmissionId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `review-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function submitReviewWithRetry(payload) {
+  const retryDelays = [0, 1500, 4000];
+  let lastError;
+
+  for (const delay of retryDelays) {
+    if (delay) await wait(delay);
+    try {
+      return await postApi("/api/reviews", payload);
+    } catch (error) {
+      lastError = error;
+      if (!error?.isTransient) throw error;
+    }
+  }
+
+  throw lastError;
+}
+
 function validateForm(form) {
   const errors = [];
   if (!form.fullName.trim()) errors.push("Your name is required.");
 
-  const phoneDigits = form.phone.replace(/\D/g, "");
-  const phone =
-    phoneDigits.length === 12 && phoneDigits.startsWith("91")
-      ? phoneDigits.slice(2)
-      : phoneDigits.length === 11 && phoneDigits.startsWith("0")
-        ? phoneDigits.slice(1)
-        : phoneDigits;
-  if (!/^[6-9]\d{9}$/.test(phone)) {
-    errors.push("Enter a valid 10-digit mobile number.");
+  const country = getCountryOption(form.countryCode);
+  const phone = form.phone.replace(/\D/g, "");
+  if (!country.pattern.test(phone)) {
+    errors.push(`Enter a valid ${country.digits}-digit mobile number for ${country.label}.`);
   }
 
   const email = form.email.trim();
@@ -50,6 +87,7 @@ export function ReviewModal({ isOpen, onClose, onSubmitted }) {
   const [hoverRating, setHoverRating] = useState(0);
   const firstInputRef = useRef(null);
   const overlayRef = useRef(null);
+  const submissionIdRef = useRef(createSubmissionId());
 
   useEffect(() => {
     if (isOpen) {
@@ -59,6 +97,7 @@ export function ReviewModal({ isOpen, onClose, onSubmitted }) {
       setStatus("idle");
       setErrorMsg("");
       setHoverRating(0);
+      submissionIdRef.current = createSubmissionId();
     }
   }, [isOpen]);
 
@@ -72,7 +111,24 @@ export function ReviewModal({ isOpen, onClose, onSubmitted }) {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => {
+      if (name === "countryCode") {
+        const country = getCountryOption(value);
+        return {
+          ...prev,
+          countryCode: country.code,
+          phone: prev.phone.replace(/\D/g, "").slice(0, country.digits)
+        };
+      }
+      if (name === "phone") {
+        const country = getCountryOption(prev.countryCode);
+        return {
+          ...prev,
+          phone: value.replace(/\D/g, "").slice(0, country.digits)
+        };
+      }
+      return { ...prev, [name]: value };
+    });
   }
 
   function setRating(value) {
@@ -94,9 +150,11 @@ export function ReviewModal({ isOpen, onClose, onSubmitted }) {
     setErrorMsg("");
 
     try {
-      await postApi("/api/reviews", {
+      await submitReviewWithRetry({
+        submissionId: submissionIdRef.current,
         fullName: form.fullName.trim(),
-        phone: form.phone.trim(),
+        countryCode: form.countryCode,
+        phone: form.phone,
         email: form.email.trim(),
         city: form.city.trim() || null,
         rating: Number(form.rating),
@@ -105,9 +163,9 @@ export function ReviewModal({ isOpen, onClose, onSubmitted }) {
 
       setStatus("success");
       onSubmitted?.();
-    } catch (err) {
+    } catch {
       setStatus("error");
-      setErrorMsg(err.message || "Could not submit review. Please try again.");
+      setErrorMsg("We could not submit your feedback right now. Please try again in a moment.");
     }
   }
 
@@ -168,17 +226,34 @@ export function ReviewModal({ isOpen, onClose, onSubmitted }) {
                 <label htmlFor="review-phone">
                   Mobile Number <span className="required-mark">*</span>
                 </label>
-                <input
-                  id="review-phone"
-                  name="phone"
-                  type="tel"
-                  inputMode="numeric"
-                  value={form.phone}
-                  onChange={handleChange}
-                  placeholder="10-digit Indian mobile"
-                  autoComplete="tel"
-                  required
-                />
+                <div className="phone-input-group">
+                  <select
+                    className="phone-country-select"
+                    id="review-country-code"
+                    name="countryCode"
+                    value={form.countryCode}
+                    onChange={handleChange}
+                    aria-label="Country code"
+                  >
+                    {COUNTRY_OPTIONS.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.code} {country.label}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    id="review-phone"
+                    name="phone"
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={getCountryOption(form.countryCode).digits}
+                    value={form.phone}
+                    onChange={handleChange}
+                    placeholder={getCountryOption(form.countryCode).placeholder}
+                    autoComplete="tel-national"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="form-group">

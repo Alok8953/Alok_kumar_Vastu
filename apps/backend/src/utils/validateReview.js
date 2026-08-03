@@ -1,22 +1,31 @@
-import { normalizeIndianPhone } from "./phone.js";
+import { normalizeInternationalPhone } from "./phone.js";
 
 const MIN_REVIEW_LENGTH = 20;
 const MAX_REVIEW_LENGTH = 2000;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const SUBMISSION_ID_RE = /^[a-zA-Z0-9-]{16,64}$/;
 
 export function validateReviewBody(body) {
   const errors = [];
   const fullName = typeof body?.fullName === "string" ? body.fullName.trim() : "";
+  const submissionId =
+    typeof body?.submissionId === "string" ? body.submissionId.trim() : null;
   const city = typeof body?.city === "string" ? body.city.trim() : "";
   const reviewText = typeof body?.reviewText === "string" ? body.reviewText.trim() : "";
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
-  const phone = normalizeIndianPhone(body?.phone);
+  const countryCode =
+    typeof body?.countryCode === "string" ? body.countryCode.trim() : "+91";
+  const phone = normalizeInternationalPhone(body?.phone, countryCode);
   const rating = Number(body?.rating);
 
   if (!fullName) errors.push("Your name is required.");
   else if (fullName.length > 255) errors.push("Name is too long.");
 
-  if (!phone) errors.push("Enter a valid 10-digit mobile number.");
+  if (submissionId && !SUBMISSION_ID_RE.test(submissionId)) {
+    errors.push("Invalid submission identifier.");
+  }
+
+  if (!phone) errors.push("Enter a valid mobile number for the selected country code.");
 
   if (!email) errors.push("Email is required.");
   else if (!EMAIL_RE.test(email) || email.length > 255) {
@@ -42,6 +51,14 @@ export function validateReviewBody(body) {
 
   return {
     ok: true,
-    data: { fullName, phone, email, city: city || null, rating, reviewText }
+    data: {
+      submissionId,
+      fullName,
+      phone,
+      email,
+      city: city || null,
+      rating,
+      reviewText
+    }
   };
 }

@@ -305,40 +305,4 @@ export const POSITIONING_POINTS = [
   }
 ];
 
-export const TESTIMONIALS = [
-  {
-    id: "t-rahul",
-    quote:
-      "We shifted the main entrance and cleared the NE corner as suggested. Within a few months cash flow felt less stuck — not overnight magic, but clearly better.",
-    name: "Rahul Sharma",
-    city: "Lucknow"
-  },
-  {
-    id: "t-priya",
-    quote:
-      "Bedroom and kitchen changes were simple. Home feels calmer now and arguments have come down. Didn’t expect that much from layout alone.",
-    name: "Priya Mehta",
-    city: "Noida"
-  },
-  {
-    id: "t-suresh",
-    quote:
-      "Shop seating and cash counter were wrong. After fixing the direction, walk-ins improved. Report was clear — we didn’t need to redo the whole shop.",
-    name: "Suresh Agarwal",
-    city: "Gurgaon"
-  },
-  {
-    id: "t-anjali",
-    quote:
-      "Online session was practical. Got a short list of what to change first and what can wait. Easy to follow even without being Vastu experts.",
-    name: "Anjali Desai",
-    city: "Ahmedabad"
-  },
-  {
-    id: "t-kavita",
-    quote:
-      "New flat felt restless — poor sleep. After the corrections, sleep is better and the place feels lighter. Still following the remaining steps.",
-    name: "Kavita Nair",
-    city: "Bangalore"
-  }
-];
+export const TESTIMONIALS = [];

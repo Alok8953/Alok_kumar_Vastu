@@ -12,20 +12,30 @@ const SUCCESS_MESSAGE =
 async function notifyReviewByEmail(reviewId, data, approveToken) {
   if (!isEmailConfigured()) {
     console.warn("Review saved (id=%s) but email is not configured.", reviewId);
-    return;
+    return false;
+  }
+
+  let lastError;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      await sendReviewEmail({ ...data, approveToken });
+      await markReviewEmailSent(reviewId);
+      return true;
+    } catch (err) {
+      lastError = err;
+      console.error(`Review email attempt ${attempt} failed:`, err.message);
+      if (attempt < 2) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
   }
 
   try {
-    await sendReviewEmail({ ...data, approveToken });
-    await markReviewEmailSent(reviewId);
-  } catch (err) {
-    console.error("Review email error:", err.message);
-    try {
-      await markReviewEmailFailed(reviewId, err.message);
-    } catch (logErr) {
-      console.error("Could not log review email failure:", logErr.message);
-    }
+    await markReviewEmailFailed(reviewId, lastError?.message || "Email delivery failed.");
+  } catch (logErr) {
+    console.error("Could not log review email failure:", logErr.message);
   }
+  return false;
 }
 
 export async function reviewController(req, res) {
@@ -38,11 +48,22 @@ export async function reviewController(req, res) {
   const data = validation.data;
   let reviewId;
   let approveToken;
+  let emailAlreadySent = false;
+  let notificationData;
 
   try {
     const saved = await createClientReview(data);
     reviewId = saved.id;
     approveToken = saved.approve_token;
+    emailAlreadySent = Boolean(saved.email_sent_at);
+    notificationData = {
+      fullName: saved.full_name,
+      city: saved.city,
+      rating: saved.rating,
+      reviewText: saved.review_text,
+      phone: saved.phone,
+      email: saved.email
+    };
   } catch (err) {
     console.error("Review save error:", err.message);
     return res.status(503).json({
@@ -50,10 +71,19 @@ export async function reviewController(req, res) {
     });
   }
 
-  void notifyReviewByEmail(reviewId, data, approveToken);
+  const emailSent =
+    emailAlreadySent ||
+    (await notifyReviewByEmail(reviewId, notificationData, approveToken));
+
+  if (!emailSent) {
+    return res.status(503).json({
+      error: "Your review was saved, but the notification could not be sent yet."
+    });
+  }
 
   return res.status(200).json({
     message: SUCCESS_MESSAGE,
-    id: reviewId
+    id: reviewId,
+    emailSent: true
   });
 }

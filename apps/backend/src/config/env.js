@@ -20,12 +20,22 @@ function parseDatabaseUrl(rawUrl) {
 const databaseUrl = process.env.DATABASE_URL || "";
 const fromUrl = parseDatabaseUrl(databaseUrl);
 
+const frontendOrigin = (process.env.FRONTEND_ORIGIN || "http://localhost:5173").replace(
+  /\/$/,
+  ""
+);
+const nodeEnv = process.env.NODE_ENV || "development";
+const serveFrontend = process.env.SERVE_FRONTEND === "true";
+const configuredBackendPublicUrl = (process.env.BACKEND_PUBLIC_URL || "").replace(/\/$/, "");
+
 export const env = {
-  nodeEnv: process.env.NODE_ENV || "development",
+  nodeEnv,
   port: process.env.PORT || 5000,
-  frontendOrigin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
-  backendPublicUrl: (process.env.BACKEND_PUBLIC_URL || "").replace(/\/$/, ""),
-  serveFrontend: process.env.SERVE_FRONTEND === "true",
+  frontendOrigin,
+  backendPublicUrl:
+    configuredBackendPublicUrl ||
+    (nodeEnv === "production" && serveFrontend ? frontendOrigin : ""),
+  serveFrontend,
   adminApiKey: process.env.ADMIN_API_KEY || "",
   resendApiKey: process.env.RESEND_API_KEY || "",
   resendFrom:

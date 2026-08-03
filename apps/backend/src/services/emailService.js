@@ -241,18 +241,18 @@ async function sendWithGmail({ subject, html, text, replyTo }) {
 }
 
 async function deliverEmail(mail) {
-  if (isResendConfigured()) {
+  if (isGmailConfigured()) {
     try {
-      await sendWithResend(mail);
+      await sendWithGmail(mail);
       return;
-    } catch (resendError) {
-      if (!isGmailConfigured()) throw resendError;
-      console.warn("Resend failed; retrying through Gmail:", resendError.message);
+    } catch (gmailError) {
+      if (!isResendConfigured()) throw gmailError;
+      console.warn("Gmail failed; retrying through Resend:", gmailError.message);
     }
   }
 
-  if (isGmailConfigured()) {
-    await sendWithGmail(mail);
+  if (isResendConfigured()) {
+    await sendWithResend(mail);
     return;
   }
 
