@@ -71,19 +71,13 @@ export async function reviewController(req, res) {
     });
   }
 
-  const emailSent =
-    emailAlreadySent ||
-    (await notifyReviewByEmail(reviewId, notificationData, approveToken));
-
-  if (!emailSent) {
-    return res.status(503).json({
-      error: "Your review was saved, but the notification could not be sent yet."
-    });
+  if (!emailAlreadySent) {
+    void notifyReviewByEmail(reviewId, notificationData, approveToken);
   }
 
   return res.status(200).json({
     message: SUCCESS_MESSAGE,
     id: reviewId,
-    emailSent: true
+    emailSent: emailAlreadySent
   });
 }

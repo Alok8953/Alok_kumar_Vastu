@@ -163,9 +163,12 @@ export function ReviewModal({ isOpen, onClose, onSubmitted }) {
 
       setStatus("success");
       onSubmitted?.();
-    } catch {
+    } catch (err) {
       setStatus("error");
-      setErrorMsg("We could not submit your feedback right now. Please try again in a moment.");
+      setErrorMsg(
+        err?.message ||
+          "We could not submit your feedback right now. Please try again in a moment."
+      );
     }
   }
 
